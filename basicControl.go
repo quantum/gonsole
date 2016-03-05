@@ -33,7 +33,7 @@ func (ctrl *BasicControl) Init(id string) {
 func (ctrl *BasicControl) GetAbsolutePosition() Box {
 	if parent := ctrl.Parent(); parent != nil {
 		parentBox := parent.ContentBox()
-		return ctrl.Position.Box(parentBox.Width+1, parentBox.Height).Absolute(parentBox)
+		return ctrl.Position.Box(parentBox.Width, parentBox.Height).Absolute(parentBox)
 	}
 	w, h := termbox.Size()
 	return ctrl.Position.Box(w, h)

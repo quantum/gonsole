@@ -2,7 +2,10 @@
 // TODO support theming
 package gonsole
 
-import "github.com/nsf/termbox-go"
+import (
+	"github.com/mitchellh/go-wordwrap"
+	"github.com/nsf/termbox-go"
+)
 
 func ClearRect(box Box, color, backgroundColor termbox.Attribute) {
 	for x := box.Left; x < box.Right(); x++ {
@@ -57,13 +60,15 @@ func DrawCursor() {
 // TODO support line breaking for multiline strings
 // TODO support alignment
 func DrawTextBox(text string, box Box, foreground termbox.Attribute, background termbox.Attribute) {
+
+	wrapText := wordwrap.WrapString(text, uint(box.Width))
+
 	x := box.Left
 	y := box.Top
 
-	for _, char := range text {
-		if char == '\r' {
+	for _, char := range wrapText {
+		if char == '\n' {
 			x = box.Left
-		} else if char == '\n' {
 			y++
 		} else {
 			termbox.SetCell(x, y, char, foreground, background)

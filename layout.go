@@ -139,32 +139,3 @@ func (p Position) Box(w, h int) Box {
 		Height: calcPosition(h, p.Height),
 	}
 }
-
-type LineType int
-
-const (
-	LineNone = iota
-	LineTransparent
-	LineSingle
-	LineSingleCorners
-	LineDouble
-	LineDoubleCorners
-	LineDashed
-	LineDotted
-)
-
-type HorizontalAlignment int
-
-const (
-	HorizontalAlignmentLeft = iota
-	HorizontalAlignmentCenter
-	HorizontalAlignmentRight
-)
-
-type VerticalAlignment int
-
-const (
-	HorizontalAlignmentTop = iota
-	HorizontalAlignmentMiddle
-	HorizontalAlignmentBottom
-)

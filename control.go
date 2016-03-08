@@ -18,9 +18,7 @@ type Control interface {
 	Parent() Control
 	SetParent(parent Control)
 
-	Border() LineType
-	SetBorder(lineType LineType)
-	HasBorder() bool
+	GetStyle() Style
 
 	Dirty() bool
 	Pollute()

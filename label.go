@@ -15,5 +15,6 @@ func NewLabel(id string) *Label {
 func (l *Label) Repaint() {
 	l.BasicControl.Repaint()
 
-	DrawTextBox(l.Text, l.ContentBox(), l.Foreground, l.Background)
+	style := l.GetStyle()
+	DrawTextBox(l.Text, l.ContentBox(), style.Fg, style.Bg)
 }

@@ -12,7 +12,6 @@ type Button struct {
 func NewButton(id string) *Button {
 	button := &Button{}
 	button.Init(id)
-	button.SetBorder(LineSingleCorners)
 	button.SetFocussable(true)
 	return button
 }
@@ -23,8 +22,10 @@ func (c *Button) Repaint() {
 	}
 	c.BasicControl.Repaint()
 
+	style := c.GetStyle()
+
 	// content area
-	DrawTextSimple(c.Text, c.ContentBox(), c.Foreground, c.Background)
+	DrawTextSimple(c.Text, c.ContentBox(), style.Fg, style.Bg)
 }
 
 func (btn *Button) ParseEvent(ev *termbox.Event) bool {

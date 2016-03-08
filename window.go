@@ -8,8 +8,8 @@ type Window struct {
 	ID         string
 	Width      int
 	Height     int
-	Background termbox.Attribute
-	Foreground termbox.Attribute
+	Background Attribute
+	Foreground Attribute
 
 	// internal state
 	focussedControl Control

@@ -32,18 +32,19 @@ func (c *Checkbox) Repaint() {
 	c.BasicControl.Repaint()
 
 	// Box
-	var icon rune
+	var icon string
 	if c.Checked {
-		icon = '☑'
+		icon = "☑"
 	} else {
-		icon = '☐'
+		icon = "☐"
 	}
+
 	contentBox := c.ContentBox()
-	foreground := c.Foreground
-	if c.Focussed() && !c.HasBorder() {
-		foreground = termbox.ColorYellow
-	}
-	termbox.SetCell(contentBox.Left, contentBox.Top, icon, foreground, c.Background)
+
+	style := c.GetStyle()
+
+	DrawTextSimple(icon, contentBox, style.Fg, style.Bg)
+
 	// Label
 	label := c.label
 	label.Text = c.Text

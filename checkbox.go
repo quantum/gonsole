@@ -8,18 +8,10 @@ type Checkbox struct {
 	// custom
 	Text    string
 	Checked bool
-
-	// internal
-	label *Label
 }
 
 func NewCheckbox(id string) *Checkbox {
-	// auxiliary label
-	label := NewLabel("__lbl_" + id)
-
-	checkbox := &Checkbox{
-		label: label,
-	}
+	checkbox := &Checkbox{}
 	checkbox.Init(id)
 	checkbox.SetFocussable(true)
 	return checkbox
@@ -45,13 +37,7 @@ func (c *Checkbox) Repaint() {
 
 	DrawTextSimple(icon, contentBox, style.Fg, style.Bg)
 
-	// Label
-	label := c.label
-	label.Text = c.Text
-	label.Position = c.ContentBox().Minus(Sides{Left: 2}).Position()
-	// make sure the label is repainted too
-	label.Pollute()
-	label.Repaint()
+	DrawTextBox(c.Text, contentBox.Minus(Sides{Left: 2}), style.Fg, style.Bg)
 }
 
 func (chk *Checkbox) ParseEvent(ev *termbox.Event) bool {

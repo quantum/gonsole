@@ -108,7 +108,7 @@ func (ctrl *BasicControl) Repaint() {
 
 	style := ctrl.GetStyle()
 
-	if style.Bg != 0 {
+	if style.Bg != ColorDefault {
 		FillRect(ctrl.GetAbsolutePosition(), style.Fg, style.Bg)
 	}
 	ctrl.DrawBorder()
@@ -117,7 +117,9 @@ func (ctrl *BasicControl) Repaint() {
 
 func (ctrl *BasicControl) Focussed() bool {
 	if ctrl.Window() != nil {
-		return ctrl.Window().FocussedControl().ID() == ctrl.ID()
+		if ctrl.Window().FocussedControl() != nil {
+			return ctrl.Window().FocussedControl().ID() == ctrl.ID()
+		}
 	}
 	return false
 }

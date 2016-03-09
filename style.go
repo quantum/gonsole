@@ -52,8 +52,8 @@ const (
 )
 
 type Style struct {
-	Fg Attribute // inherited from parent by default
-	Bg Attribute // inherited from parent by default
+	Fg Attribute
+	Bg Attribute
 
 	Margin  Sides
 	Padding Sides

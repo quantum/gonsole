@@ -22,9 +22,8 @@ func (c *Button) Repaint() {
 	}
 	c.BasicControl.Repaint()
 
-	style := c.GetStyle()
-
 	// content area
+	style := c.GetStyle()
 	DrawTextSimple(c.Text, c.ContentBox(), style.Fg, style.Bg)
 }
 

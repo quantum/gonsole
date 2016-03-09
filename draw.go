@@ -20,8 +20,8 @@ func ClearRect(box Box, foreground, background Attribute) {
 func FillRect(box Box, foreground, background Attribute) {
 	fg := termboxAttr(foreground)
 	bg := termboxAttr(background)
-	for x := box.Left; x < box.Right(); x++ {
-		for y := box.Top; y < box.Bottom(); y++ {
+	for x := box.Left; x <= box.Right(); x++ {
+		for y := box.Top; y <= box.Bottom(); y++ {
 			termbox.SetCell(x, y, ' ', fg, bg)
 		}
 	}

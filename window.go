@@ -117,7 +117,7 @@ func (win *Window) ParseEvent(ev *termbox.Event) bool {
 	// TODO window level event parsing, support tabbing for changing focus
 
 	// dispatch event to currently focussed control
-	if win.FocussedControl().ParseEvent(ev) {
+	if win.FocussedControl() != nil && win.FocussedControl().ParseEvent(ev) {
 		return true
 	}
 

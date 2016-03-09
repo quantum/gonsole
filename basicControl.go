@@ -4,11 +4,12 @@ import "github.com/nsf/termbox-go"
 
 // Control is the base model for a UI control
 type BasicControl struct {
-	window     *Window
-	parent     Control
-	id         string
-	focussable bool
-	dirty      bool
+	window         *Window
+	parent         Control
+	id             string
+	focussable     bool
+	dirty          bool
+	requiresCursor bool
 
 	Position Position
 	Visible  bool
@@ -112,6 +113,11 @@ func (ctrl *BasicControl) Repaint() {
 		FillRect(ctrl.GetAbsolutePosition(), style.Fg, style.Bg)
 	}
 	ctrl.DrawBorder()
+
+	if ctrl.Focussed() && !ctrl.requiresCursor {
+		HideCursor()
+	}
+
 	// implement details in controls
 }
 
@@ -134,6 +140,10 @@ func (ctrl *BasicControl) Focussable() bool {
 
 func (ctrl *BasicControl) SetFocussable(focussable bool) {
 	ctrl.focussable = focussable
+}
+
+func (ctrl *BasicControl) SetRequiresCursor(requiresCursor bool) {
+	ctrl.requiresCursor = requiresCursor
 }
 
 func (ctrl *BasicControl) Parent() Control {

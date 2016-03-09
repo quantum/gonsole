@@ -12,6 +12,8 @@ type Control interface {
 	Focussable() bool
 	SetFocussable(focussable bool)
 
+	SetRequiresCursor(requiresCursor bool)
+
 	SetWindow(win *Window)
 	Window() *Window
 

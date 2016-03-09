@@ -89,7 +89,12 @@ func DrawScrollBar(left, top, height, pos int, foreground, background Attribute)
 	}
 }
 
-func DrawCursor() {
+func DrawCursor(x, y int) {
+	termbox.SetCursor(x, y)
+}
+
+func HideCursor() {
+	termbox.HideCursor()
 }
 
 // TODO support line breaking for multiline strings

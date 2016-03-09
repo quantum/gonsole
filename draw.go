@@ -66,6 +66,29 @@ func DrawLineVertical(left, top, height int, lineType LineType, foreground, back
 	}
 }
 
+func ScrollPos(index, count, height int) int {
+	pos := int(float32(index) / float32(count) * float32(height-2))
+	return pos
+}
+
+func DrawScrollBar(left, top, height, pos int, foreground, background Attribute) {
+	fg := termboxAttr(foreground)
+	bg := termboxAttr(background)
+
+	runes := []rune("░■▲▼")
+
+	termbox.SetCell(left, top, runes[2], fg, bg)
+	termbox.SetCell(left, top+height-1, runes[3], fg, bg)
+	if height > 2 {
+		for y := top + 1; y < top+height-1; y++ {
+			termbox.SetCell(left, y, runes[0], fg, bg)
+		}
+	}
+	if pos != -1 {
+		termbox.SetCell(left, top+pos+1, runes[1], fg, bg)
+	}
+}
+
 func DrawCursor() {
 }
 
@@ -92,13 +115,18 @@ func DrawTextBox(text string, box Box, foreground, background Attribute) {
 	}
 }
 
-func DrawTextSimple(text string, box Box, foreground, background Attribute) {
+func DrawTextSimple(text string, fill bool, box Box, foreground, background Attribute) {
 	fg := termboxAttr(foreground)
 	bg := termboxAttr(background)
 	index := 0
 	for _, char := range text {
 		termbox.SetCell(box.Left+index, box.Top, char, fg, bg)
 		index++
+	}
+	if fill {
+		for x := index; x < box.Width; x++ {
+			termbox.SetCell(box.Left+x, box.Top, ' ', bg, bg)
+		}
 	}
 }
 

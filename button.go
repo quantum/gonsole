@@ -24,7 +24,7 @@ func (c *Button) Repaint() {
 
 	// content area
 	style := c.GetStyle()
-	DrawTextSimple(c.Text, c.ContentBox(), style.Fg, style.Bg)
+	DrawTextSimple(c.Text, false, c.ContentBox(), style.Fg, style.Bg)
 }
 
 func (btn *Button) ParseEvent(ev *termbox.Event) bool {

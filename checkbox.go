@@ -35,7 +35,7 @@ func (c *Checkbox) Repaint() {
 
 	style := c.GetStyle()
 
-	DrawTextSimple(icon, contentBox, style.Fg, style.Bg)
+	DrawTextSimple(icon, false, contentBox, style.Fg, style.Bg)
 
 	DrawTextBox(c.Text, contentBox.Minus(Sides{Left: 2}), style.Fg, style.Bg)
 }

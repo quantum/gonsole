@@ -128,9 +128,9 @@ func (win *Window) ParseEvent(ev *termbox.Event) bool {
 		switch ev.Key {
 		case termbox.KeyTab:
 			win.FocusNext()
-		case termbox.KeyArrowDown:
+		case termbox.KeyArrowDown, termbox.KeyArrowRight:
 			win.FocusNext()
-		case termbox.KeyArrowUp:
+		case termbox.KeyArrowUp, termbox.KeyArrowLeft:
 			win.FocusPrev()
 		}
 	}

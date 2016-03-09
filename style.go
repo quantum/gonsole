@@ -62,6 +62,12 @@ type Style struct {
 	BorderBg Attribute
 	BorderFg Attribute
 
+	ScrollFg Attribute
+	ScrollBg Attribute
+
+	SelectedFg Attribute
+	SelectedBg Attribute
+
 	HAlign HorizontalAlignment
 	VAlign VerticalAlignment
 }

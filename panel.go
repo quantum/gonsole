@@ -1,31 +1,31 @@
 package gonsole
 
 type Panel struct {
-	ContainerControl
-
-	// custom
-	Title string
+	BaseControl
+	BaseContainer
 }
 
-func NewPanel(id string) *Panel {
+func NewPanel(win *Window, parent Container, id string) *Panel {
 	panel := &Panel{}
-	panel.Init(id)
+	panel.BaseControl.Init(win, parent, id)
+	parent.AddControl(panel)
 	return panel
 }
 
-func (c *Panel) Repaint() {
-	if !c.Dirty() {
+func (p *Panel) Repaint() {
+	if !p.Dirty() {
 		return
 	}
-	c.ContainerControl.Repaint()
+	p.BaseControl.Repaint()
+	p.BaseContainer.RepaintChildren()
 
 	// draw title
-	if c.Title != "" {
-		if c.Style.Border == LineNone {
-			c.Style.Padding = c.Style.Padding.Plus(Sides{Top: 1})
+	if p.Title() != "" {
+		if p.BorderType() == LineNone {
+			p.SetPadding(p.Padding().Plus(Sides{Top: 1}))
 		}
 
-		DrawTextSimple(" "+c.Title+" ", false, c.BorderBox().Minus(Sides{Left: 2}), c.Style.Fg, c.Style.Bg)
+		DrawTextSimple(" "+p.Title()+" ", false, p.BorderBox().Minus(Sides{Left: 2}), p.fg, p.bg)
 	}
 
 	// content area (ContainerControl already takes care of drawing the children)

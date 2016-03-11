@@ -8,20 +8,24 @@ import (
 )
 
 type Progress struct {
-	BasicControl
+	BaseControl
 
 	// a value between 0 and 1
 	Value float32
 }
 
-func NewProgress(id string) *Progress {
+func NewProgress(win *Window, parent Container, id string) *Progress {
 	p := &Progress{}
-	p.Init(id)
+	p.Init(win, parent, id)
+	parent.AddControl(p)
 	return p
 }
 
 func (p *Progress) Repaint() {
-	p.BasicControl.Repaint()
+	if !p.Dirty() {
+		return
+	}
+	p.BaseControl.Repaint()
 
 	cb := p.ContentBox()
 
@@ -29,8 +33,7 @@ func (p *Progress) Repaint() {
 	text += fmt.Sprintf("%d%%", int(p.Value*100))
 	text += strings.Repeat(" ", (cb.Width/2)-3)
 
-	style := p.GetStyle()
 	percent := int(p.Value * float32(cb.Width))
-	DrawTextSimple(xs.Slice(text, 0, percent), false, p.ContentBox(), style.Fg|AttrReverse, style.Bg)
-	DrawTextSimple(xs.Slice(text, percent, -1), false, Box{cb.Left + percent, cb.Top, cb.Width - percent, cb.Height}, style.Fg, style.Bg)
+	DrawTextSimple(xs.Slice(text, 0, percent), false, p.ContentBox(), p.fg|AttrReverse, p.bg)
+	DrawTextSimple(xs.Slice(text, percent, -1), false, Box{cb.Left + percent, cb.Top, cb.Width - percent, cb.Height}, p.fg, p.fg)
 }

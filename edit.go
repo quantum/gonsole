@@ -7,71 +7,88 @@ import (
 )
 
 type Edit struct {
-	BasicControl
+	BaseControl
 
-	Value string
-	// the max width of the value. By default set to the width of the control
-	MaxWidth int
-
+	value         string
+	maxWidth      int
 	cursorPos     int
 	startingIndex int
 }
 
-func NewEdit(id string) *Edit {
+func NewEdit(win AppWindow, parent Container, id string) *Edit {
 	edit := &Edit{}
-	edit.Init(id)
-	edit.SetFocussable(true)
-	edit.SetRequiresCursor(true)
+	edit.Init(win, parent, id)
+	edit.SetFocusable(true)
+	edit.SetCursorable(true)
+	parent.AddControl(edit)
 	return edit
 }
 
-func (e *Edit) Repaint() {
-	e.BasicControl.Repaint()
+func (e *Edit) Value() string {
+	return e.value
+}
 
-	style := e.GetStyle()
+func (e *Edit) SetValue(value string) {
+	e.value = value
+}
+
+func (e *Edit) MaxWidth() int {
+	return e.maxWidth
+}
+
+func (e *Edit) SetMaxWidth(width int) {
+	e.maxWidth = width
+}
+
+func (e *Edit) Repaint() {
+	if !e.Dirty() {
+		return
+	}
+	e.BaseControl.Repaint()
+
 	box := e.ContentBox()
 
 	var shownValue string
 	var cursorOffset int
-	length := xs.Len(e.Value)
+	length := xs.Len(e.value)
 	width := e.ContentBox().Width
 
 	if e.startingIndex == 0 {
 		if length < width {
-			shownValue = e.Value
+			shownValue = e.value
 		} else {
-			shownValue = xs.Slice(e.Value, 0, width)
+			shownValue = xs.Slice(e.value, 0, width)
 		}
 		cursorOffset = e.cursorPos
 	} else {
 		if length-e.startingIndex < width {
-			shownValue = xs.Slice(e.Value, e.startingIndex, -1)
+			shownValue = xs.Slice(e.value, e.startingIndex, -1)
 		} else {
-			shownValue = xs.Slice(e.Value, e.startingIndex, e.startingIndex+width)
+			shownValue = xs.Slice(e.value, e.startingIndex, e.startingIndex+width)
 		}
 		cursorOffset = e.cursorPos - e.startingIndex
 	}
 
-	DrawTextSimple(shownValue, true, box, style.Fg, style.Bg)
+	DrawTextSimple(shownValue, true, box, e.fg, e.bg)
 
-	if e.Focussed() {
+	if e.Focused() {
 		DrawCursor(box.Left+cursorOffset, box.Top)
 	}
 }
 
 func (e *Edit) handleChar(ch rune) {
-	length := xs.Len(e.Value)
+	length := xs.Len(e.value)
 
-	if e.MaxWidth > 0 && length >= e.MaxWidth {
+	if e.maxWidth > 0 && length >= e.maxWidth {
 		return
 	}
 
 	if e.cursorPos == 0 {
-		e.Value = string(ch) + e.Value
+		e.value = string(ch) + e.value
 	} else if e.cursorPos < length {
-		e.Value = xs.Slice(e.Value, 0, e.cursorPos) + string(ch) + xs.Slice(e.Value, e.cursorPos, -1)
+		e.value = xs.Slice(e.value, 0, e.cursorPos) + string(ch) + xs.Slice(e.value, e.cursorPos, -1)
 	} else {
-		e.Value += string(ch)
+		e.value += string(ch)
 	}
 
 	e.cursorPos++
@@ -84,21 +101,21 @@ func (e *Edit) handleChar(ch rune) {
 }
 
 func (e *Edit) handleBackspace() {
-	if e.cursorPos == 0 || e.Value == "" {
+	if e.cursorPos == 0 || e.value == "" {
 		return
 	}
 
-	length := xs.Len(e.Value)
+	length := xs.Len(e.value)
 
 	if e.cursorPos >= length {
 		e.cursorPos--
-		e.Value = xs.Slice(e.Value, 0, length-1)
+		e.value = xs.Slice(e.value, 0, length-1)
 	} else if e.cursorPos == 1 {
 		e.cursorPos = 0
-		e.Value = xs.Slice(e.Value, 1, -1)
+		e.value = xs.Slice(e.value, 1, -1)
 	} else {
 		e.cursorPos--
-		e.Value = xs.Slice(e.Value, 0, e.cursorPos) + xs.Slice(e.Value, e.cursorPos+1, -1)
+		e.value = xs.Slice(e.value, 0, e.cursorPos) + xs.Slice(e.value, e.cursorPos+1, -1)
 	}
 
 	width := e.ContentBox().Width
@@ -109,16 +126,16 @@ func (e *Edit) handleBackspace() {
 }
 
 func (e *Edit) handleDelete() {
-	length := xs.Len(e.Value)
+	length := xs.Len(e.value)
 
-	if e.cursorPos == length || e.Value == "" {
+	if e.cursorPos == length || e.value == "" {
 		return
 	}
 
 	if e.cursorPos == length-1 {
-		e.Value = xs.Slice(e.Value, 0, length-1)
+		e.value = xs.Slice(e.value, 0, length-1)
 	} else {
-		e.Value = xs.Slice(e.Value, 0, e.cursorPos) + xs.Slice(e.Value, e.cursorPos+1, -1)
+		e.value = xs.Slice(e.value, 0, e.cursorPos) + xs.Slice(e.value, e.cursorPos+1, -1)
 	}
 
 	width := e.ContentBox().Width
@@ -129,7 +146,7 @@ func (e *Edit) handleDelete() {
 }
 
 func (e *Edit) handleLeft() {
-	if e.cursorPos == 0 || e.Value == "" {
+	if e.cursorPos == 0 || e.value == "" {
 		return
 	}
 
@@ -141,9 +158,9 @@ func (e *Edit) handleLeft() {
 }
 
 func (e *Edit) handleRight() {
-	length := xs.Len(e.Value)
+	length := xs.Len(e.value)
 
-	if e.cursorPos == length || e.Value == "" {
+	if e.cursorPos == length || e.value == "" {
 		return
 	}
 
@@ -162,7 +179,7 @@ func (e *Edit) handleHome() {
 }
 
 func (e *Edit) handleEnd() {
-	length := xs.Len(e.Value)
+	length := xs.Len(e.value)
 
 	e.cursorPos = length
 
@@ -199,7 +216,7 @@ func (e *Edit) ParseEvent(ev *termbox.Event) bool {
 			return true
 		case termbox.KeyEnter:
 			m := make(map[string]interface{})
-			m["value"] = e.Value
+			m["value"] = e.value
 			e.SubmitEvent(&Event{"submit", e, m})
 			return true
 		default:

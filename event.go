@@ -2,9 +2,13 @@ package gonsole
 
 import "fmt"
 
+type EventSource interface {
+	ID() string
+}
+
 type Event struct {
 	Type   string
-	Source Control
+	Source EventSource
 	Data   map[string]interface{}
 }
 
@@ -28,7 +32,7 @@ func (ed *EventDispatcher) SubmitEvent(ev *Event) {
 	}
 }
 
-func (ed *EventDispatcher) AddEventListener(source Control, eventType string, handler func(ev *Event) bool) {
+func (ed *EventDispatcher) AddEventListener(source EventSource, eventType string, handler func(ev *Event) bool) {
 	key := ed.getKey(source, eventType)
 	funcArray, ok := ed.registeredEvents[key]
 	if !ok {
@@ -38,6 +42,6 @@ func (ed *EventDispatcher) AddEventListener(source Control, eventType string, ha
 	ed.registeredEvents[key] = funcArray
 }
 
-func (ed *EventDispatcher) getKey(source Control, eventType string) string {
+func (ed *EventDispatcher) getKey(source EventSource, eventType string) string {
 	return fmt.Sprintf("%s___%s", source.ID(), eventType)
 }

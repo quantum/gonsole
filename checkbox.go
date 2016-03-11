@@ -3,41 +3,52 @@ package gonsole
 import "github.com/nsf/termbox-go"
 
 type Checkbox struct {
-	BasicControl
+	BaseControl
 
-	// custom
-	Text    string
-	Checked bool
+	text    string
+	checked bool
 }
 
-func NewCheckbox(id string) *Checkbox {
+func NewCheckbox(win AppWindow, parent Container, id string) *Checkbox {
 	checkbox := &Checkbox{}
-	checkbox.Init(id)
-	checkbox.SetFocussable(true)
+	checkbox.Init(win, parent, id)
+	checkbox.SetFocusable(true)
+	parent.AddControl(checkbox)
 	return checkbox
+}
+
+func (c *Checkbox) Text() string {
+	return c.text
+}
+
+func (c *Checkbox) SetText(text string) {
+	c.text = text
+}
+
+func (c *Checkbox) Checked() bool {
+	return c.checked
+}
+
+func (c *Checkbox) SeChecked(checked bool) {
+	c.checked = checked
 }
 
 func (c *Checkbox) Repaint() {
 	if !c.Dirty() {
 		return
 	}
-	c.BasicControl.Repaint()
+	c.BaseControl.Repaint()
 
-	// Box
 	var icon string
-	if c.Checked {
+	if c.checked {
 		icon = "☑"
 	} else {
 		icon = "☐"
 	}
 
 	contentBox := c.ContentBox()
-
-	style := c.GetStyle()
-
-	DrawTextSimple(icon, false, contentBox, style.Fg, style.Bg)
-
-	DrawTextBox(c.Text, contentBox.Minus(Sides{Left: 2}), style.Fg, style.Bg)
+	DrawTextSimple(icon, false, contentBox, c.fg, c.bg)
+	DrawTextBox(c.text, contentBox.Minus(Sides{Left: 2}), c.fg, c.bg)
 }
 
 func (chk *Checkbox) ParseEvent(ev *termbox.Event) bool {
@@ -48,9 +59,9 @@ func (chk *Checkbox) ParseEvent(ev *termbox.Event) bool {
 			fallthrough
 		case termbox.KeySpace:
 			// change state
-			chk.Checked = !chk.Checked
+			chk.checked = !chk.checked
 			// events
-			if chk.Checked {
+			if chk.checked {
 				chk.SubmitEvent(&Event{"checked", chk, nil})
 			} else {
 				chk.SubmitEvent(&Event{"unchecked", chk, nil})

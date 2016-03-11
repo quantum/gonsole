@@ -1,20 +1,31 @@
 package gonsole
 
 type Label struct {
-	BasicControl
-	Text string
-	//Alignment
+	BaseControl
+
+	text string
 }
 
-func NewLabel(id string) *Label {
+func NewLabel(win AppWindow, parent Container, id string) *Label {
 	label := &Label{}
-	label.Init(id)
+	label.Init(win, parent, id)
+	parent.AddControl(label)
 	return label
 }
 
-func (l *Label) Repaint() {
-	l.BasicControl.Repaint()
+func (l *Label) Text() string {
+	return l.text
+}
 
-	style := l.GetStyle()
-	DrawTextBox(l.Text, l.ContentBox(), style.Fg, style.Bg)
+func (l *Label) SetText(text string) {
+	l.text = text
+}
+
+func (l *Label) Repaint() {
+	if !l.Dirty() {
+		return
+	}
+	l.BaseControl.Repaint()
+
+	DrawTextBox(l.text, l.ContentBox(), l.fg, l.bg)
 }

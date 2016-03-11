@@ -6,8 +6,8 @@ import "github.com/nsf/termbox-go"
 type App struct {
 	CloseKey        termbox.Key
 	EventDispatcher *EventDispatcher
-	windows         []*Window
-	activeWindow    *Window
+	windows         []AppWindow
+	activeWindow    AppWindow
 }
 
 // NewApp creates a new app
@@ -19,24 +19,34 @@ func NewApp() *App {
 }
 
 func (app *App) Repaint() {
-	// get active window, paint it
-	if app.activeWindow.IsDirty() {
-		app.activeWindow.Repaint()
+	dirty := false
+	for _, window := range app.windows {
+		if window.Dirty() {
+			window.Repaint()
+			dirty = true
+		}
+	}
+
+	if dirty {
+		termbox.Flush()
 	}
 }
 
-func (app *App) AddWindow(win *Window) {
-	win.App = app
+func (app *App) Stop() {
+	termbox.Interrupt()
+}
+
+func (app *App) ActivateWindow(win AppWindow) {
+	app.activeWindow = win
+}
+
+func (app *App) addWindow(win AppWindow) {
 	app.windows = append(app.windows, win)
 
 	// first window is automatically activated
 	if len(app.windows) == 1 {
 		app.ActivateWindow(win)
 	}
-}
-
-func (app *App) ActivateWindow(win *Window) {
-	app.activeWindow = win
 }
 
 func (app *App) Run() {
@@ -48,6 +58,7 @@ func (app *App) Run() {
 	termbox.SetInputMode(termbox.InputEsc)
 
 	app.Repaint()
+
 mainloop:
 	for {
 		// poll events
@@ -57,6 +68,8 @@ mainloop:
 			if app.CloseKey == ev.Key {
 				break mainloop
 			}
+		case termbox.EventInterrupt:
+			break mainloop
 		case termbox.EventError:
 			panic(ev.Err)
 		}

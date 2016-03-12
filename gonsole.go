@@ -8,12 +8,14 @@ type App struct {
 	EventDispatcher *EventDispatcher
 	windows         []AppWindow
 	activeWindow    AppWindow
+	theme           *Theme
 }
 
 // NewApp creates a new app
 func NewApp() *App {
 	app := &App{
 		EventDispatcher: NewEventDispatcher(),
+		theme:           defaultTheme,
 	}
 	return app
 }
@@ -34,6 +36,14 @@ func (app *App) Repaint() {
 
 func (app *App) Stop() {
 	termbox.Interrupt()
+}
+
+func (app *App) Theme() *Theme {
+	return app.theme
+}
+
+func (app *App) SetTheme(theme *Theme) {
+	app.theme = theme
 }
 
 func (app *App) ActivateWindow(win AppWindow) {
@@ -57,6 +67,7 @@ func (app *App) Run() {
 	defer termbox.Close()
 	termbox.SetInputMode(termbox.InputEsc)
 
+	termbox.Clear(app.Theme().ColorTermbox("app.fg"), app.Theme().ColorTermbox("app.bg"))
 	app.Repaint()
 
 mainloop:

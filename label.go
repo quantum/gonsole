@@ -8,7 +8,7 @@ type Label struct {
 
 func NewLabel(win AppWindow, parent Container, id string) *Label {
 	label := &Label{}
-	label.Init(win, parent, id)
+	label.Init(win, parent, id, "label")
 	parent.AddControl(label)
 	return label
 }
@@ -27,5 +27,7 @@ func (l *Label) Repaint() {
 	}
 	l.BaseControl.Repaint()
 
-	DrawTextBox(l.text, l.ContentBox(), l.fg, l.bg)
+	t := l.Theme()
+	fg, bg := t.ColorTermbox("fg"), t.ColorTermbox("bg")
+	DrawTextBox(l.text, l.ContentBox(), fg, bg)
 }

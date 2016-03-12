@@ -10,7 +10,7 @@ type Button struct {
 
 func NewButton(win AppWindow, parent Container, id string) *Button {
 	button := &Button{}
-	button.Init(win, parent, id)
+	button.Init(win, parent, id, "button")
 	button.SetFocusable(true)
 	parent.AddControl(button)
 	return button
@@ -28,14 +28,16 @@ func (b *Button) Repaint() {
 	if !b.Dirty() {
 		return
 	}
+
 	b.BaseControl.Repaint()
 
-	fg, bg := b.Colors()
-
+	t := b.Theme()
+	cb := b.ContentBox()
 	if b.Focused() {
-		fg, bg = b.FocusColors()
+		DrawTextSimple(b.text, false, cb, t.ColorTermbox("focused.fg"), t.ColorTermbox("focused.bg"))
+	} else {
+		DrawTextSimple(b.text, false, cb, t.ColorTermbox("fg"), t.ColorTermbox("bg"))
 	}
-	DrawTextSimple(b.text, false, b.ContentBox(), fg, bg)
 }
 
 func (b *Button) ParseEvent(ev *termbox.Event) bool {

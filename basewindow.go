@@ -12,8 +12,8 @@ type BaseWindow struct {
 }
 
 func (win *BaseWindow) Init(app *App, id string) {
-	win.BaseElement.Init(win, nil, id)
 	win.app = app
+	win.BaseElement.Init(win, nil, id, "window")
 	app.addWindow(win)
 }
 
@@ -107,7 +107,7 @@ func (win *BaseWindow) Repaint() {
 		return
 	}
 
-	win.BaseElement.Repaint()
+	win.drawBox("")
 	win.BaseContainer.RepaintChildren()
 
 	// draw title
@@ -115,8 +115,8 @@ func (win *BaseWindow) Repaint() {
 		if win.BorderType() == LineNone {
 			win.SetPadding(win.Padding().Plus(Sides{Top: 1}))
 		}
-
-		DrawTextSimple(" "+win.Title()+" ", false, win.BorderBox().Minus(Sides{Left: 2}), win.fg, win.bg)
+		fg, bg := win.Theme().ColorTermbox("title.fg"), win.Theme().ColorTermbox("title.bg")
+		DrawTextSimple(" "+win.Title()+" ", false, win.BorderBox().Minus(Sides{Left: 2}), fg, bg)
 	}
 }
 

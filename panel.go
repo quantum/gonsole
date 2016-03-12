@@ -7,7 +7,7 @@ type Panel struct {
 
 func NewPanel(win *Window, parent Container, id string) *Panel {
 	panel := &Panel{}
-	panel.BaseControl.Init(win, parent, id)
+	panel.BaseControl.Init(win, parent, id, "panel")
 	parent.AddControl(panel)
 	return panel
 }
@@ -25,7 +25,9 @@ func (p *Panel) Repaint() {
 			p.SetPadding(p.Padding().Plus(Sides{Top: 1}))
 		}
 
-		DrawTextSimple(" "+p.Title()+" ", false, p.BorderBox().Minus(Sides{Left: 2}), p.fg, p.bg)
+		t := p.Theme()
+		fg, bg := t.ColorTermbox("fg"), t.ColorTermbox("bg")
+		DrawTextSimple(" "+p.Title()+" ", false, p.BorderBox().Minus(Sides{Left: 2}), fg, bg)
 	}
 
 	// content area (ContainerControl already takes care of drawing the children)

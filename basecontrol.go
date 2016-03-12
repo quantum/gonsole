@@ -36,3 +36,11 @@ func (c *BaseControl) Cursorable() bool {
 func (c *BaseControl) SetCursorable(cursorable bool) {
 	c.cursorable = cursorable
 }
+
+func (c *BaseControl) Repaint() {
+	if c.Focused() {
+		c.drawBox("focused")
+	} else {
+		c.drawBox("")
+	}
+}

@@ -7,9 +7,7 @@ import (
 	"github.com/nsf/termbox-go"
 )
 
-func ClearRect(box Box, foreground, background Attribute) {
-	fg := termboxAttr(foreground)
-	bg := termboxAttr(background)
+func ClearRect(box Box, fg, bg termbox.Attribute) {
 	for x := box.Left; x < box.Right(); x++ {
 		for y := box.Top; y < box.Bottom(); y++ {
 			termbox.SetCell(x, y, ' ', fg, bg)
@@ -17,9 +15,7 @@ func ClearRect(box Box, foreground, background Attribute) {
 	}
 }
 
-func FillRect(box Box, foreground, background Attribute) {
-	fg := termboxAttr(foreground)
-	bg := termboxAttr(background)
+func FillRect(box Box, fg, bg termbox.Attribute) {
 	for x := box.Left; x <= box.Right(); x++ {
 		for y := box.Top; y <= box.Bottom(); y++ {
 			termbox.SetCell(x, y, ' ', fg, bg)
@@ -27,40 +23,29 @@ func FillRect(box Box, foreground, background Attribute) {
 	}
 }
 
-func DrawBorder(box Box, lineType LineType, foreground, background Attribute) {
+func DrawBorder(box Box, lineType LineType, fg, bg termbox.Attribute) {
 	right := box.Right()
 	bottom := box.Bottom()
 	runes := getLineRunes(lineType)
-	// draw box.Top and bottom lines
-	for y := box.Top; y < box.Top+box.Height; y = y + box.Height - 1 {
-		DrawLineHorizontal(box.Left+1, y, box.Width, lineType, foreground, background)
-	}
-	// draw box.Left and right lines
-	for x := box.Left; x < box.Left+box.Width; x = x + box.Width - 1 {
-		DrawLineVertical(x, box.Top+1, box.Height, lineType, foreground, background)
-	}
-	// draw corners
-	fg := termboxAttr(foreground)
-	bg := termboxAttr(background)
+
+	DrawLineHorizontal(box.Left, box.Top, box.Width, lineType, fg, bg)
+	DrawLineHorizontal(box.Left, box.Bottom(), box.Width, lineType, fg, bg)
+	DrawLineVertical(box.Left, box.Top, box.Height, lineType, fg, bg)
+	DrawLineVertical(box.Right(), box.Top, box.Height, lineType, fg, bg)
+
 	termbox.SetCell(box.Left, box.Top, runes[2], fg, bg)
 	termbox.SetCell(right, box.Top, runes[3], fg, bg)
 	termbox.SetCell(box.Left, bottom, runes[4], fg, bg)
 	termbox.SetCell(right, bottom, runes[5], fg, bg)
 }
 
-func DrawLineHorizontal(left, top, width int, lineType LineType, foreground, background Attribute) {
-	fg := termboxAttr(foreground)
-	bg := termboxAttr(background)
-
+func DrawLineHorizontal(left, top, width int, lineType LineType, fg, bg termbox.Attribute) {
 	for x := left; x < left+width-1; x++ {
 		termbox.SetCell(x, top, getLineRunes(lineType)[0], fg, bg)
 	}
 }
 
-func DrawLineVertical(left, top, height int, lineType LineType, foreground, background Attribute) {
-	fg := termboxAttr(foreground)
-	bg := termboxAttr(background)
-
+func DrawLineVertical(left, top, height int, lineType LineType, fg, bg termbox.Attribute) {
 	for y := top; y < top+height-1; y++ {
 		termbox.SetCell(left, y, getLineRunes(lineType)[1], fg, bg)
 	}
@@ -71,10 +56,7 @@ func ScrollPos(index, count, height int) int {
 	return pos
 }
 
-func DrawScrollBar(left, top, height, pos int, foreground, background Attribute) {
-	fg := termboxAttr(foreground)
-	bg := termboxAttr(background)
-
+func DrawScrollBar(left, top, height, pos int, fg, bg termbox.Attribute) {
 	runes := []rune("░■▲▼")
 
 	termbox.SetCell(left, top, runes[2], fg, bg)
@@ -99,11 +81,7 @@ func HideCursor() {
 
 // TODO support line breaking for multiline strings
 // TODO support alignment
-func DrawTextBox(text string, box Box, foreground, background Attribute) {
-
-	fg := termboxAttr(foreground)
-	bg := termboxAttr(background)
-
+func DrawTextBox(text string, box Box, fg, bg termbox.Attribute) {
 	wrapText := wordwrap.WrapString(text, uint(box.Width))
 
 	x := box.Left
@@ -120,9 +98,7 @@ func DrawTextBox(text string, box Box, foreground, background Attribute) {
 	}
 }
 
-func DrawTextSimple(text string, fill bool, box Box, foreground, background Attribute) {
-	fg := termboxAttr(foreground)
-	bg := termboxAttr(background)
+func DrawTextSimple(text string, fill bool, box Box, fg, bg termbox.Attribute) {
 	index := 0
 	for _, char := range text {
 		termbox.SetCell(box.Left+index, box.Top, char, fg, bg)
@@ -139,6 +115,8 @@ func getLineRunes(lineType LineType) []rune {
 	// https://en.wikipedia.org/wiki/Box-drawing_character
 	var runes []rune
 	switch lineType {
+	case LineNone:
+		panic("LineNone is not valid")
 	case LineTransparent:
 		runes = []rune{' ', ' ', ' ', ' ', ' ', ' '}
 	case LineSingle:

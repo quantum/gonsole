@@ -3,26 +3,24 @@ package gonsole
 import "github.com/nsf/termbox-go"
 
 type BaseElement struct {
-	window             AppWindow
-	parent             Container
-	id                 string
-	dirty              bool
-	enabled            bool
-	position           Position
-	margin             Sides
-	padding            Sides
-	fg, bg             Attribute
-	fgFocus, bgFocus   Attribute
-	border             LineType
-	fgBorder, bgBorder Attribute
+	window   AppWindow
+	parent   Container
+	id       string
+	dirty    bool
+	enabled  bool
+	position Position
+	margin   Sides
+	padding  Sides
+	theme    *Theme
 }
 
-func (e *BaseElement) Init(window AppWindow, parent Container, id string) {
+func (e *BaseElement) Init(window AppWindow, parent Container, id, themePrefix string) {
 	e.window = window
 	e.parent = parent
 	e.id = id
 	e.enabled = true
 	e.dirty = true
+	e.theme = NewTheme(themePrefix, e.window.App().Theme())
 }
 
 func (e *BaseElement) GetWindow() AppWindow {
@@ -78,38 +76,38 @@ func (e *BaseElement) SetPadding(paddings Sides) {
 }
 
 func (e *BaseElement) Colors() (fg Attribute, bg Attribute) {
-	return e.fg, e.bg
+	return e.Theme().Color("fg"), e.Theme().Color("bg")
 }
 
 func (e *BaseElement) SetColors(fg Attribute, bg Attribute) {
-	e.fg = fg
-	e.bg = bg
+	e.Theme().SetColor("fg", fg)
+	e.Theme().SetColor("bg", bg)
 }
 
 func (e *BaseElement) FocusColors() (fg Attribute, bg Attribute) {
-	return e.fgFocus, e.bgFocus
+	return e.Theme().Color("focus.fg"), e.Theme().Color("focus.fg")
 }
 
 func (e *BaseElement) SetFocusColors(fg Attribute, bg Attribute) {
-	e.fgFocus = fg
-	e.bgFocus = bg
+	e.Theme().SetColor("focus.fg", fg)
+	e.Theme().SetColor("focus.bg", bg)
 }
 
 func (e *BaseElement) BorderType() LineType {
-	return e.border
+	return e.Theme().Border("border")
 }
 
 func (e *BaseElement) SetBorderType(border LineType) {
-	e.border = border
+	e.Theme().SetBorder("border", border)
 }
 
 func (e *BaseElement) BorderColors() (fg Attribute, bg Attribute) {
-	return e.fgBorder, e.bgBorder
+	return e.Theme().Color("border.fg"), e.Theme().Color("border.bg")
 }
 
 func (e *BaseElement) SetBorderColors(fg Attribute, bg Attribute) {
-	e.fgBorder = fg
-	e.bgBorder = bg
+	e.Theme().SetColor("border.fg", fg)
+	e.Theme().SetColor("border.bg", bg)
 }
 
 func (e *BaseElement) AbsolutePosition() Box {
@@ -129,7 +127,7 @@ func (e *BaseElement) ContentBox() Box {
 	// substract padding and margin
 	contentBox := e.AbsolutePosition().Minus(e.margin).Minus(e.padding)
 	// substract border if applicable
-	if e.border != LineNone {
+	if e.BorderType() != LineNone {
 		contentBox = contentBox.Minus(Sides{1, 1, 1, 1})
 	}
 	return contentBox
@@ -147,19 +145,18 @@ func (e *BaseElement) ParseEvent(ev *termbox.Event) bool {
 	return false
 }
 
-func (e *BaseElement) Repaint() {
-	if !e.Dirty() {
-		return
-	}
-	ClearRect(e.BorderBox(), ColorDefault, ColorDefault)
+func (e *BaseElement) drawBox(status string) {
+	t := e.Theme()
 
-	if e.bg != ColorDefault {
-		FillRect(e.AbsolutePosition(), e.fg, e.bg)
-	}
+	// ClearRect(e.BorderBox(), fg, bg)
+	FillRect(e.AbsolutePosition(), t.ColorTermbox(status+"fg"), t.ColorTermbox(status+"bg"))
 
-	if e.border != LineNone {
-		DrawBorder(e.BorderBox(), e.border, e.fgBorder, e.bgBorder)
+	border := t.Border(status + "border")
+	if border != LineNone {
+		DrawBorder(e.BorderBox(), border, t.ColorTermbox(status+"border.fg"), t.ColorTermbox(status+"border.bg"))
 	}
+}
 
-	// implement details in controls
+func (e *BaseElement) Theme() *Theme {
+	return e.theme
 }

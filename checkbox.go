@@ -11,7 +11,7 @@ type Checkbox struct {
 
 func NewCheckbox(win AppWindow, parent Container, id string) *Checkbox {
 	checkbox := &Checkbox{}
-	checkbox.Init(win, parent, id)
+	checkbox.Init(win, parent, id, "checkbox")
 	checkbox.SetFocusable(true)
 	parent.AddControl(checkbox)
 	return checkbox
@@ -37,18 +37,22 @@ func (c *Checkbox) Repaint() {
 	if !c.Dirty() {
 		return
 	}
+
 	c.BaseControl.Repaint()
 
 	var icon string
+
 	if c.checked {
 		icon = "☑"
 	} else {
 		icon = "☐"
 	}
 
+	t := c.Theme()
+	fg, bg := t.ColorTermbox("fg"), t.ColorTermbox("bg")
 	contentBox := c.ContentBox()
-	DrawTextSimple(icon, false, contentBox, c.fg, c.bg)
-	DrawTextBox(c.text, contentBox.Minus(Sides{Left: 2}), c.fg, c.bg)
+	DrawTextSimple(icon, false, contentBox, fg, bg)
+	DrawTextBox(c.text, contentBox.Minus(Sides{Left: 2}), fg, bg)
 }
 
 func (chk *Checkbox) ParseEvent(ev *termbox.Event) bool {

@@ -44,6 +44,8 @@ type Element interface {
 	ParseEvent(ev *termbox.Event) bool
 
 	Repaint()
+
+	Theme() *Theme
 }
 
 // An element that is a container for controls

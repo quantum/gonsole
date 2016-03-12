@@ -12,7 +12,7 @@ type List struct {
 
 func NewList(win AppWindow, parent Container, id string) *List {
 	list := &List{}
-	list.Init(win, parent, id)
+	list.Init(win, parent, id, "list")
 	list.SetFocusable(true)
 	parent.AddControl(list)
 	return list
@@ -34,20 +34,23 @@ func (l *List) Repaint() {
 
 	contentBox := l.ContentBox()
 
+	t := l.Theme()
+
 	count := len(l.options)
 	if count > contentBox.Height {
 		count = contentBox.Height
 
 		pos := ScrollPos(l.selectedIndex, len(l.options), contentBox.Height)
-		DrawScrollBar(contentBox.Right(), contentBox.Top, contentBox.Height, pos, l.fg, l.bg)
+		fg, bg := t.ColorTermbox("scroll.fg"), t.ColorTermbox("scroll.bg")
+		DrawScrollBar(contentBox.Right(), contentBox.Top, contentBox.Height, pos, fg, bg)
 		contentBox = contentBox.Minus(Sides{Right: 1})
 	}
 
 	for i := 0; i < count; i++ {
-		fg, bg := l.Colors()
+		fg, bg := t.ColorTermbox("fg"), t.ColorTermbox("bg")
 
 		if i+l.topIndex == l.selectedIndex {
-			fg, bg = l.FocusColors()
+			fg, bg = t.ColorTermbox("selected.fg"), t.ColorTermbox("selected.bg")
 		}
 
 		DrawTextSimple(l.options[l.topIndex+i], true, Box{contentBox.Left, contentBox.Top + i, contentBox.Width, 1}, fg, bg)

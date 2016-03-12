@@ -17,7 +17,7 @@ type Edit struct {
 
 func NewEdit(win AppWindow, parent Container, id string) *Edit {
 	edit := &Edit{}
-	edit.Init(win, parent, id)
+	edit.Init(win, parent, id, "edit")
 	edit.SetFocusable(true)
 	edit.SetCursorable(true)
 	parent.AddControl(edit)
@@ -69,7 +69,9 @@ func (e *Edit) Repaint() {
 		cursorOffset = e.cursorPos - e.startingIndex
 	}
 
-	DrawTextSimple(shownValue, true, box, e.fg, e.bg)
+	t := e.Theme()
+	fg, bg := t.ColorTermbox("fg"), t.ColorTermbox("bg")
+	DrawTextSimple(shownValue, true, box, fg, bg)
 
 	if e.Focused() {
 		DrawCursor(box.Left+cursorOffset, box.Top)

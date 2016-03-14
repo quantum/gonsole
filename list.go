@@ -35,22 +35,26 @@ func (l *List) Repaint() {
 	contentBox := l.ContentBox()
 
 	t := l.Theme()
+	focused := ""
+	if l.Focused() {
+		focused = "focused."
+	}
 
 	count := len(l.options)
 	if count > contentBox.Height {
 		count = contentBox.Height
 
 		pos := ScrollPos(l.selectedIndex, len(l.options), contentBox.Height)
-		fg, bg := t.ColorTermbox("scroll.fg"), t.ColorTermbox("scroll.bg")
+		fg, bg := t.ColorTermbox(focused+"scroll.fg"), t.ColorTermbox(focused+"scroll.bg")
 		DrawScrollBar(contentBox.Right(), contentBox.Top, contentBox.Height, pos, fg, bg)
 		contentBox = contentBox.Minus(Sides{Right: 1})
 	}
 
 	for i := 0; i < count; i++ {
-		fg, bg := t.ColorTermbox("fg"), t.ColorTermbox("bg")
+		fg, bg := t.ColorTermbox(focused+"fg"), t.ColorTermbox(focused+"bg")
 
 		if i+l.topIndex == l.selectedIndex {
-			fg, bg = t.ColorTermbox("selected.fg"), t.ColorTermbox("selected.bg")
+			fg, bg = t.ColorTermbox(focused+"selected.fg"), t.ColorTermbox(focused+"selected.bg")
 		}
 
 		DrawTextSimple(l.options[l.topIndex+i], true, Box{contentBox.Left, contentBox.Top + i, contentBox.Width, 1}, fg, bg)

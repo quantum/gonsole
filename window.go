@@ -9,5 +9,6 @@ type Window struct {
 func NewWindow(app *App, id string) *Window {
 	win := &Window{}
 	win.Init(app, id)
+	win.App().addWindow(win)
 	return win
 }

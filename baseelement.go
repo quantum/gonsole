@@ -134,11 +134,11 @@ func (e *BaseElement) ContentBox() Box {
 }
 
 func (e *BaseElement) AddEventListener(eventType string, handler func(ev *Event) bool) {
-	e.window.App().EventDispatcher.AddEventListener(e, eventType, handler)
+	e.window.App().eventDispatcher.AddEventListener(e, eventType, handler)
 }
 
 func (e *BaseElement) SubmitEvent(ev *Event) {
-	e.window.App().EventDispatcher.SubmitEvent(ev)
+	e.window.App().eventDispatcher.SubmitEvent(ev)
 }
 
 func (e *BaseElement) ParseEvent(ev *termbox.Event) bool {

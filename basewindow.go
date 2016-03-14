@@ -14,7 +14,6 @@ type BaseWindow struct {
 func (win *BaseWindow) Init(app *App, id string) {
 	win.app = app
 	win.BaseElement.Init(win, nil, id, "window")
-	app.addWindow(win)
 }
 
 func (win *BaseWindow) App() *App {
@@ -58,10 +57,6 @@ func (win *BaseWindow) moveFocus(num int) {
 	// update focus, mark dirty
 	currentFocusControl.SetDirty(true)
 	newFocusControl.SetDirty(true)
-
-	if !newFocusControl.Cursorable() {
-		HideCursor()
-	}
 }
 
 func (win *BaseWindow) getFocusableControls() []Control {

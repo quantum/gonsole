@@ -7,12 +7,12 @@ import (
 	"github.com/huandu/xstrings"
 )
 
-type MessageDialog struct {
+type InputDialog struct {
 	BaseWindow
 }
 
-func NewMessageDialog(app *App, id, title, message string, buttons []string) *MessageDialog {
-	d := &MessageDialog{}
+func NewInputDialog(app *App, id, title, message string, buttons []string) *InputDialog {
+	d := &InputDialog{}
 	d.Init(app, id)
 	d.App().addWindow(d)
 	d.SetTitle(title)
@@ -21,6 +21,15 @@ func NewMessageDialog(app *App, id, title, message string, buttons []string) *Me
 	label.SetPosition(Position{"0", "0", "100%", "80%"})
 	label.SetText(message)
 
+	edit := NewEdit(d, d, "edit")
+	edit.SetPosition(Position{"10%", "10%", "80%", "1"})
+	edit.Focus()
+	edit.AddEventListener("submit", func(ev *Event) bool {
+		d.App().eventDispatcher.SubmitEvent(&Event{"closed", d, ev.Data})
+		d.App().removeWindow(d)
+		return true
+	})
+
 	buttonCount := len(buttons)
 
 	for i, button := range buttons {
@@ -28,10 +37,6 @@ func NewMessageDialog(app *App, id, title, message string, buttons []string) *Me
 		btn := NewButton(d, d, fmt.Sprintf("%s__button%d", id, i))
 		btn.SetPosition(Position{fmt.Sprintf("%d%%-%d", (i*buttonCount+1)*100/(buttonCount*2), textLen/2), "80%", strconv.Itoa(textLen), "1"})
 		btn.SetText(button)
-
-		if i == 0 {
-			btn.Focus()
-		}
 
 		btn.AddEventListener("clicked", func(ev *Event) bool {
 			m := make(map[string]interface{})

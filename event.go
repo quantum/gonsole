@@ -42,6 +42,17 @@ func (ed *EventDispatcher) AddEventListener(source EventSource, eventType string
 	ed.registeredEvents[key] = funcArray
 }
 
+func (ed *EventDispatcher) RemoveEventListener(source EventSource) {
+	delete(ed.registeredEvents, source.ID())
+
+	container, ok := source.(Container)
+	if ok {
+		for _, c := range container.ChildrenDeep() {
+			delete(ed.registeredEvents, c.ID())
+		}
+	}
+}
+
 func (ed *EventDispatcher) getKey(source EventSource, eventType string) string {
 	return fmt.Sprintf("%s___%s", source.ID(), eventType)
 }

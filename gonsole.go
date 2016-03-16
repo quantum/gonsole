@@ -13,6 +13,7 @@ type App struct {
 	windows         []AppWindow
 	theme           *Theme
 	channel         chan Event
+	redraw          int
 }
 
 // NewApp creates a new app
@@ -31,6 +32,8 @@ func (app *App) ID() string {
 
 func (app *App) Repaint() {
 	termbox.Clear(app.Theme().ColorTermbox("app.fg"), app.Theme().ColorTermbox("app.bg"))
+
+	DrawTextSimple(fmt.Sprintf("redraw %d", app.redraw), false, Box{0, 0, 20, 1}, termbox.ColorRed, termbox.ColorBlack)
 
 	dirty := false
 	for _, window := range app.windows {
@@ -166,6 +169,7 @@ func (app *App) Run() {
 
 		case ev := <-app.channel:
 			if ev.Type == "redraw" {
+				app.redraw++
 				app.Repaint()
 			} else if ev.Type == "quit" {
 				return

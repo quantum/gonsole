@@ -156,6 +156,8 @@ func (app *App) Run() {
 				if !handled {
 					app.parseGlobalEvent(&ev)
 				}
+			case termbox.EventResize:
+				app.Repaint()
 			case termbox.EventInterrupt:
 				return
 			case termbox.EventError:

@@ -73,6 +73,7 @@ func (l *List) ParseEvent(ev *termbox.Event) bool {
 					l.topIndex++
 				}
 			}
+			l.GetWindow().App().Redraw()
 			return true
 
 		case termbox.KeyArrowUp:
@@ -82,6 +83,7 @@ func (l *List) ParseEvent(ev *termbox.Event) bool {
 					l.topIndex--
 				}
 			}
+			l.GetWindow().App().Redraw()
 			return true
 
 		case termbox.KeyHome:
@@ -95,6 +97,7 @@ func (l *List) ParseEvent(ev *termbox.Event) bool {
 			if contentBox.Height > 0 {
 				l.topIndex = len(l.options) - contentBox.Height
 			}
+			l.GetWindow().App().Redraw()
 			return true
 
 		case termbox.KeySpace:

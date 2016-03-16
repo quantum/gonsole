@@ -56,6 +56,6 @@ func (p *Progress) Repaint() {
 
 	t := p.Theme()
 	percent := int(p.value * float32(cb.Width))
-	DrawTextSimple(xs.Slice(text, 0, percent), false, p.ContentBox(), t.ColorTermbox("filled.fg"), t.ColorTermbox("filled.bg"))
+	DrawTextSimple(xs.Slice(text, 0, percent - 1), false, p.ContentBox(), t.ColorTermbox("filled.fg"), t.ColorTermbox("filled.bg"))
 	DrawTextSimple(xs.Slice(text, percent, -1), false, Box{cb.Left + percent, cb.Top, cb.Width - percent, cb.Height}, t.ColorTermbox("empty.fg"), t.ColorTermbox("empty.bg"))
 }

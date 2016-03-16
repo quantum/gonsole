@@ -74,6 +74,7 @@ func (e *Edit) Repaint() {
 	DrawTextSimple(shownValue, true, box, fg, bg)
 
 	if e.Focused() {
+		DrawTextSimple(" ", false, Box{box.Left+cursorOffset, box.Top, 1, 1}, t.ColorTermbox("cursor"), bg)
 		DrawCursor(box.Left+cursorOffset, box.Top)
 	}
 }
@@ -197,24 +198,31 @@ func (e *Edit) ParseEvent(ev *termbox.Event) bool {
 		switch ev.Key {
 		case termbox.KeySpace:
 			e.handleChar(' ')
+			e.GetWindow().App().Redraw()
 			return true
 		case termbox.KeyBackspace, termbox.KeyBackspace2:
 			e.handleBackspace()
+			e.GetWindow().App().Redraw()
 			return true
 		case termbox.KeyDelete:
 			e.handleDelete()
+			e.GetWindow().App().Redraw()
 			return true
 		case termbox.KeyArrowLeft:
 			e.handleLeft()
+			e.GetWindow().App().Redraw()
 			return true
 		case termbox.KeyArrowRight:
 			e.handleRight()
+			e.GetWindow().App().Redraw()
 			return true
 		case termbox.KeyHome:
 			e.handleHome()
+			e.GetWindow().App().Redraw()
 			return true
 		case termbox.KeyEnd:
 			e.handleEnd()
+			e.GetWindow().App().Redraw()
 			return true
 		case termbox.KeyEnter:
 			m := make(map[string]interface{})
@@ -224,6 +232,7 @@ func (e *Edit) ParseEvent(ev *termbox.Event) bool {
 		default:
 			if ev.Ch != 0 {
 				e.handleChar(ev.Ch)
+				e.GetWindow().App().Redraw()
 				return true
 			}
 		}

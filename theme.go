@@ -157,7 +157,7 @@ var defaultTheme *Theme
 func init() {
 	defaultTheme = NewTheme("", nil)
 
-	defaultTheme.setValue("app.fg", ColorBlue)
+	defaultTheme.setValue("app.fg", ColorWhite)
 	defaultTheme.setValue("app.bg", ColorBlue)
 
 	defaultTheme.setValue("window.fg", ColorBlack)
@@ -182,6 +182,7 @@ func init() {
 
 	defaultTheme.setValue("edit.fg", ColorWhite)
 	defaultTheme.setValue("edit.bg", ColorBlue)
+	defaultTheme.setValue("edit.cursor", ColorYellow)
 	defaultTheme.setValue("edit.border", LineNone)
 	defaultTheme.setValue("edit.focused.fg", ColorWhite)
 	defaultTheme.setValue("edit.focused.bg", ColorBlue)

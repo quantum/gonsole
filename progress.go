@@ -33,6 +33,10 @@ func (p *Progress) SetValue(value float32) {
 
 	p.value = value
 
+	if (p.value > 1) {
+		p.value = 1
+	}
+
 	if currentPercent != newPercent {
 		p.window.App().Redraw()
 	}

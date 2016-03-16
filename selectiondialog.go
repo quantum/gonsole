@@ -27,7 +27,7 @@ func NewSelectionDialog(app *App, id, title, message string, buttons []string, i
 	list.Focus()
 	list.AddEventListener("selected", func(ev *Event) bool {
 		d.App().eventDispatcher.SubmitEvent(&Event{"closed", d, ev.Data})
-		d.App().removeWindow(d)
+		d.Close()
 		return true
 	})
 
@@ -43,7 +43,7 @@ func NewSelectionDialog(app *App, id, title, message string, buttons []string, i
 			m := make(map[string]interface{})
 			m["index"] = i
 			d.App().eventDispatcher.SubmitEvent(&Event{"closed", d, m})
-			d.App().removeWindow(d)
+			d.Close()
 			return true
 		})
 	}

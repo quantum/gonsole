@@ -26,7 +26,7 @@ func NewInputDialog(app *App, id, title, message string, buttons []string) *Inpu
 	edit.Focus()
 	edit.AddEventListener("submit", func(ev *Event) bool {
 		d.App().eventDispatcher.SubmitEvent(&Event{"closed", d, ev.Data})
-		d.App().removeWindow(d)
+		d.Close()
 		return true
 	})
 
@@ -42,7 +42,7 @@ func NewInputDialog(app *App, id, title, message string, buttons []string) *Inpu
 			m := make(map[string]interface{})
 			m["index"] = i
 			d.App().eventDispatcher.SubmitEvent(&Event{"closed", d, m})
-			d.App().removeWindow(d)
+			d.Close()
 			return true
 		})
 	}

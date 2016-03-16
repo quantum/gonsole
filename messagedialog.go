@@ -37,7 +37,7 @@ func NewMessageDialog(app *App, id, title, message string, buttons []string) *Me
 			m := make(map[string]interface{})
 			m["index"] = i
 			d.App().eventDispatcher.SubmitEvent(&Event{"closed", d, m})
-			d.App().removeWindow(d)
+			d.Close()
 			return true
 		})
 	}

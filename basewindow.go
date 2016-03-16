@@ -28,9 +28,15 @@ func (win *BaseWindow) FocusControl(control Control) {
 	for _, loopFC := range win.ChildrenDeep() {
 		if loopFC.ID() == control.ID() {
 			win.focusedControl = loopFC
+			win.App().Redraw()
 			return
 		}
 	}
+}
+
+func (win *BaseWindow) Close() {
+	win.App().removeWindow(win)
+	win.App().Redraw()
 }
 
 func (win *BaseWindow) moveFocus(num int) {

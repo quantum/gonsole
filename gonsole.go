@@ -12,6 +12,7 @@ type App struct {
 	eventDispatcher *EventDispatcher
 	windows         []AppWindow
 	theme           *Theme
+	channel         chan Event
 }
 
 // NewApp creates a new app
@@ -19,6 +20,7 @@ func NewApp() *App {
 	app := &App{
 		eventDispatcher: NewEventDispatcher(),
 		theme:           defaultTheme,
+		channel:         make(chan Event),
 	}
 	return app
 }
@@ -28,6 +30,8 @@ func (app *App) ID() string {
 }
 
 func (app *App) Repaint() {
+	termbox.Clear(app.Theme().ColorTermbox("app.fg"), app.Theme().ColorTermbox("app.bg"))
+
 	dirty := false
 	for _, window := range app.windows {
 		if window.Enabled() && window.Dirty() {
@@ -51,8 +55,18 @@ func (app *App) Repaint() {
 	}
 }
 
+func (app *App) putEvent(eventType string) {
+	go func() {
+		app.channel <- Event{Type: eventType, Source: app}
+	}()
+}
+
+func (app *App) Redraw() {
+	app.putEvent("redraw")
+}
+
 func (app *App) Stop() {
-	termbox.Interrupt()
+	app.putEvent("quit")
 }
 
 func (app *App) Theme() *Theme {
@@ -115,31 +129,45 @@ func (app *App) Run() {
 	defer termbox.Close()
 	termbox.SetInputMode(termbox.InputEsc)
 
-mainloop:
+	eventQueue := make(chan termbox.Event)
+	go func() {
+		for {
+			eventQueue <- termbox.PollEvent()
+		}
+	}()
+
+	app.Repaint()
+
 	for {
-		termbox.Clear(app.Theme().ColorTermbox("app.fg"), app.Theme().ColorTermbox("app.bg"))
-		app.Repaint()
+		select {
+		case ev := <-eventQueue:
+			switch ev.Type {
+			case termbox.EventKey:
+				if app.CloseKey == ev.Key {
+					return
+				}
 
-		ev := termbox.PollEvent()
-		switch ev.Type {
-		case termbox.EventKey:
-			if app.CloseKey == ev.Key {
-				break mainloop
+				handled := false
+				activeWindow := app.activeWindow()
+				if activeWindow != nil {
+					handled = activeWindow.ParseEvent(&ev)
+				}
+
+				if !handled {
+					app.parseGlobalEvent(&ev)
+				}
+			case termbox.EventInterrupt:
+				return
+			case termbox.EventError:
+				panic(ev.Err)
 			}
-		case termbox.EventInterrupt:
-			break mainloop
-		case termbox.EventError:
-			panic(ev.Err)
-		}
 
-		handled := false
-		activeWindow := app.activeWindow()
-		if activeWindow != nil {
-			handled = activeWindow.ParseEvent(&ev)
-		}
-
-		if !handled {
-			app.parseGlobalEvent(&ev)
+		case ev := <-app.channel:
+			if ev.Type == "redraw" {
+				app.Repaint()
+			} else if ev.Type == "quit" {
+				return
+			}
 		}
 	}
 }

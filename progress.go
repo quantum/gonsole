@@ -27,6 +27,7 @@ func (p *Progress) Value() float32 {
 
 func (p *Progress) SetValue(value float32) {
 	p.value = value
+	p.window.App().Redraw()
 }
 
 func (p *Progress) Repaint() {

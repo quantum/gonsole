@@ -81,6 +81,7 @@ type AppWindow interface {
 	Container
 
 	App() *App
+	Close()
 
 	FocusedControl() Control
 	FocusControl(control Control)

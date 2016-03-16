@@ -27,7 +27,7 @@ func (ed *EventDispatcher) SubmitEvent(ev *Event) {
 	key := ed.getKey(ev.Source, ev.Type)
 	if funcs, ok := ed.registeredEvents[key]; ok {
 		for _, function := range funcs {
-			function(ev)
+			go function(ev)
 		}
 	}
 }

@@ -162,6 +162,8 @@ func init() {
 
 	defaultTheme.setValue("window.fg", ColorBlack)
 	defaultTheme.setValue("window.bg", ColorWhite)
+	defaultTheme.setValue("window.shadow", LineTransparent)
+	defaultTheme.setValue("window.shadow.fg", ColorBlack)
 	defaultTheme.setValue("window.border", LineSingle)
 	defaultTheme.setValue("window.border.fg", ColorBlack)
 	defaultTheme.setValue("window.border.bg", ColorWhite)

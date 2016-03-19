@@ -39,6 +39,13 @@ func DrawBorder(box Box, lineType LineType, fg, bg termbox.Attribute) {
 	termbox.SetCell(right, bottom, runes[5], fg, bg)
 }
 
+func DrawShadow(box Box, shadow termbox.Attribute) {
+	bottom := box.Bottom()
+	right := box.Right()
+	DrawLineHorizontal(box.Left+1, bottom, box.Width, LineTransparent, shadow, shadow)
+	DrawLineVertical(right, box.Top+1, box.Height-1, LineTransparent, shadow, shadow)
+}
+
 func DrawLineHorizontal(left, top, width int, lineType LineType, fg, bg termbox.Attribute) {
 	for x := left; x < left+width-1; x++ {
 		termbox.SetCell(x, top, getLineRunes(lineType)[0], fg, bg)

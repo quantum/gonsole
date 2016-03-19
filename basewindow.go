@@ -102,7 +102,6 @@ func (win *BaseWindow) ParseEvent(ev *termbox.Event) bool {
 	return false
 }
 
-// Repaint the window
 func (win *BaseWindow) Repaint() {
 	if !win.Dirty() {
 		return
@@ -120,17 +119,3 @@ func (win *BaseWindow) Repaint() {
 		DrawTextSimple(" "+win.Title()+" ", false, win.BorderBox().Minus(Sides{Left: 2}), fg, bg)
 	}
 }
-
-/*
-func (win *BaseWindow) RemoveControl(ctrl Control) {
-	for i, loopFC := range win.controls {
-		if loopFC.ID() == ctrl.ID() {
-			if i < len(win.controls)-1 {
-				win.controls = append(win.controls[:i], win.controls[i+1:]...)
-			} else {
-				win.controls = win.controls[:i]
-			}
-		}
-	}
-}
-*/

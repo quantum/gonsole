@@ -90,18 +90,19 @@ func (app *App) addWindow(win AppWindow) {
 	app.windows = append(app.windows, win)
 }
 
-func (app *App) removeWindow(win AppWindow) {
+func (app *App) removeWindow(win AppWindow) bool {
 	for i, w := range app.windows {
-		if w == win {
+		if w.ID() == win.ID() {
 			if i < len(app.windows)-1 {
 				app.windows = append(app.windows[:i], app.windows[i+1:]...)
 			} else {
 				app.windows = app.windows[:i]
 			}
 			app.eventDispatcher.RemoveEventListener(win)
-			return
+			return true
 		}
 	}
+	return false
 }
 
 func (app *App) parseGlobalEvent(ev *termbox.Event) bool {

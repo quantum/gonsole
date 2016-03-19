@@ -110,6 +110,22 @@ func (e *BaseElement) SetBorderColors(fg Attribute, bg Attribute) {
 	e.Theme().SetColor("border.bg", bg)
 }
 
+func (e *BaseElement) ShadowType() LineType {
+	return e.Theme().Border("shadow")
+}
+
+func (e *BaseElement) SetShadowType(shadow LineType) {
+	e.Theme().SetBorder("shadow", shadow)
+}
+
+func (e *BaseElement) ShadowColor() Attribute {
+	return e.Theme().Color("shadow.fg")
+}
+
+func (e *BaseElement) SetShadowColor(color Attribute) {
+	e.Theme().SetColor("shadow.fg", color)
+}
+
 func (e *BaseElement) AbsolutePosition() Box {
 	if parent := e.Parent(); parent != nil {
 		parentBox := parent.ContentBox()
@@ -120,7 +136,13 @@ func (e *BaseElement) AbsolutePosition() Box {
 }
 
 func (e *BaseElement) BorderBox() Box {
-	return e.AbsolutePosition().Minus(e.margin)
+	borderBox := e.AbsolutePosition().Minus(e.margin)
+
+	if e.ShadowType() != LineNone {
+		borderBox = borderBox.Minus(Sides{0, 1, 1, 0})
+	}
+
+	return borderBox
 }
 
 func (e *BaseElement) ContentBox() Box {
@@ -129,6 +151,9 @@ func (e *BaseElement) ContentBox() Box {
 	// substract border if applicable
 	if e.BorderType() != LineNone {
 		contentBox = contentBox.Minus(Sides{1, 1, 1, 1})
+	}
+	if e.ShadowType() != LineNone {
+		contentBox = contentBox.Minus(Sides{0, 1, 1, 0})
 	}
 	return contentBox
 }
@@ -148,12 +173,16 @@ func (e *BaseElement) ParseEvent(ev *termbox.Event) bool {
 func (e *BaseElement) drawBox(status string) {
 	t := e.Theme()
 
-	// ClearRect(e.BorderBox(), fg, bg)
-	FillRect(e.AbsolutePosition(), t.ColorTermbox(status+"fg"), t.ColorTermbox(status+"bg"))
+	FillRect(e.BorderBox(), t.ColorTermbox(status+"fg"), t.ColorTermbox(status+"bg"))
 
-	border := t.Border(status + "border")
+	border := e.BorderType()
 	if border != LineNone {
 		DrawBorder(e.BorderBox(), border, t.ColorTermbox(status+"border.fg"), t.ColorTermbox(status+"border.bg"))
+	}
+
+	shadow := e.ShadowType()
+	if shadow != LineNone {
+		DrawShadow(e.AbsolutePosition(), t.ColorTermbox(status+"shadow.fg"))
 	}
 }
 

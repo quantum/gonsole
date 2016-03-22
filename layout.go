@@ -24,8 +24,8 @@ func (b Box) Bottom() int {
 
 func (b Box) Absolute(bParent Box) Box {
 	return Box{
-		Top:    bParent.Top + b.Top,
 		Left:   bParent.Left + b.Left,
+		Top:    bParent.Top + b.Top,
 		Width:  b.Width,
 		Height: b.Height,
 	}

@@ -16,6 +16,7 @@ func NewMessageDialog(app *App, id, title, message string, buttons []string) *Me
 	d.Init(app, id)
 	d.App().addWindow(d)
 	d.SetTitle(title)
+	d.SetPadding(Sides{1, 1, 1, 1})
 
 	label := NewLabel(d, d, fmt.Sprintf("%s__message", id))
 	label.SetPosition(Position{"0", "0", "100%", "80%"})

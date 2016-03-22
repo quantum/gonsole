@@ -7,14 +7,6 @@ import (
 	"github.com/nsf/termbox-go"
 )
 
-func ClearRect(box Box, fg, bg termbox.Attribute) {
-	for x := box.Left; x < box.Right(); x++ {
-		for y := box.Top; y < box.Bottom(); y++ {
-			termbox.SetCell(x, y, ' ', fg, bg)
-		}
-	}
-}
-
 func FillRect(box Box, fg, bg termbox.Attribute) {
 	for x := box.Left; x <= box.Right(); x++ {
 		for y := box.Top; y <= box.Bottom(); y++ {

@@ -41,7 +41,7 @@ func NewInputDialog(app *App, id, title, message string, buttons []string) *Inpu
 
 		btn.AddEventListener("clicked", func(ev *Event) bool {
 			m := make(map[string]interface{})
-			m["index"] = i
+			m["value"] = edit.Value()
 			d.App().eventDispatcher.SubmitEvent(&Event{"closed", d, m})
 			d.Close()
 			return true

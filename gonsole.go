@@ -86,6 +86,12 @@ func (app *App) activeWindow() AppWindow {
 	return nil
 }
 
+func (app *App) moveWindowToTop(win AppWindow) {
+	if app.removeWindow(win) {
+		app.addWindow(win)
+	}
+}
+
 func (app *App) addWindow(win AppWindow) {
 	app.windows = append(app.windows, win)
 }

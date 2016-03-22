@@ -28,10 +28,10 @@ func DrawBorder(box Box, lineType LineType, fg, bg termbox.Attribute) {
 	bottom := box.Bottom()
 	runes := getLineRunes(lineType)
 
-	DrawLineHorizontal(box.Left, box.Top, box.Width, lineType, fg, bg)
-	DrawLineHorizontal(box.Left, box.Bottom(), box.Width, lineType, fg, bg)
-	DrawLineVertical(box.Left, box.Top, box.Height, lineType, fg, bg)
-	DrawLineVertical(box.Right(), box.Top, box.Height, lineType, fg, bg)
+	DrawLineHorizontal(box.Left, box.Top, box.Width, runes[0], fg, bg)
+	DrawLineHorizontal(box.Left, box.Bottom(), box.Width, runes[0], fg, bg)
+	DrawLineVertical(box.Left, box.Top, box.Height, runes[1], fg, bg)
+	DrawLineVertical(box.Right(), box.Top, box.Height, runes[1], fg, bg)
 
 	termbox.SetCell(box.Left, box.Top, runes[2], fg, bg)
 	termbox.SetCell(right, box.Top, runes[3], fg, bg)
@@ -42,19 +42,19 @@ func DrawBorder(box Box, lineType LineType, fg, bg termbox.Attribute) {
 func DrawShadow(box Box, shadow termbox.Attribute) {
 	bottom := box.Bottom()
 	right := box.Right()
-	DrawLineHorizontal(box.Left+1, bottom, box.Width, LineTransparent, shadow, shadow)
-	DrawLineVertical(right, box.Top+1, box.Height-1, LineTransparent, shadow, shadow)
+	DrawLineHorizontal(box.Left+1, bottom, box.Width, ' ', shadow, shadow)
+	DrawLineVertical(right, box.Top+1, box.Height-1, ' ', shadow, shadow)
 }
 
-func DrawLineHorizontal(left, top, width int, lineType LineType, fg, bg termbox.Attribute) {
+func DrawLineHorizontal(left, top, width int, ch rune, fg, bg termbox.Attribute) {
 	for x := left; x < left+width-1; x++ {
-		termbox.SetCell(x, top, getLineRunes(lineType)[0], fg, bg)
+		termbox.SetCell(x, top, ch, fg, bg)
 	}
 }
 
-func DrawLineVertical(left, top, height int, lineType LineType, fg, bg termbox.Attribute) {
+func DrawLineVertical(left, top, height int, ch rune, fg, bg termbox.Attribute) {
 	for y := top; y < top+height-1; y++ {
-		termbox.SetCell(left, y, getLineRunes(lineType)[1], fg, bg)
+		termbox.SetCell(left, y, ch, fg, bg)
 	}
 }
 

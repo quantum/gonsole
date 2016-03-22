@@ -175,12 +175,12 @@ func (e *BaseElement) drawBox(status string) {
 
 	FillRect(e.BorderBox(), t.ColorTermbox(status+"fg"), t.ColorTermbox(status+"bg"))
 
-	border := e.BorderType()
+	border := t.Border(status + "border")
 	if border != LineNone {
 		DrawBorder(e.BorderBox(), border, t.ColorTermbox(status+"border.fg"), t.ColorTermbox(status+"border.bg"))
 	}
 
-	shadow := e.ShadowType()
+	shadow := t.Border(status + "shadow")
 	if shadow != LineNone {
 		DrawShadow(e.AbsolutePosition(), t.ColorTermbox(status+"shadow.fg"))
 	}

@@ -20,6 +20,20 @@ func (win *BaseWindow) App() *App {
 	return win.app
 }
 
+func (win *BaseWindow) Focused() bool {
+	aw := win.app.activeWindow()
+	if aw != nil {
+		if win.ID() == aw.ID() {
+			return true
+		}
+	}
+	return false
+}
+
+func (win *BaseWindow) Focus() {
+	win.app.moveWindowToTop(win)
+}
+
 func (win *BaseWindow) FocusedControl() Control {
 	return win.focusedControl
 }
@@ -107,7 +121,12 @@ func (win *BaseWindow) Repaint() {
 		return
 	}
 
-	win.drawBox("")
+	prefix := ""
+	if win.Focused() {
+		prefix = "focused."
+	}
+
+	win.drawBox(prefix)
 	win.BaseContainer.RepaintChildren()
 
 	// draw title
@@ -115,7 +134,7 @@ func (win *BaseWindow) Repaint() {
 		if win.BorderType() == LineNone {
 			win.SetPadding(win.Padding().Plus(Sides{Top: 1}))
 		}
-		fg, bg := win.Theme().ColorTermbox("title.fg"), win.Theme().ColorTermbox("title.bg")
+		fg, bg := win.Theme().ColorTermbox(prefix+"title.fg"), win.Theme().ColorTermbox(prefix+"title.bg")
 		DrawTextSimple(" "+win.Title()+" ", false, win.BorderBox().Minus(Sides{Left: 2}), fg, bg)
 	}
 }

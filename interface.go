@@ -14,6 +14,9 @@ type Element interface {
 	Enabled() bool
 	SetEnabled(enabled bool)
 
+	Focused() bool
+	Focus()
+
 	Position() Position
 	SetPosition(pos Position)
 
@@ -64,9 +67,6 @@ type Container interface {
 // A control which is an element that can optional be focused
 type Control interface {
 	Element
-
-	Focused() bool
-	Focus()
 
 	Focusable() bool
 	SetFocusable(active bool)

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/huandu/xstrings"
+	"github.com/quantum/castle-installer/Godeps/_workspace/src/github.com/huandu/xstrings"
 )
 
 type InputDialog struct {
@@ -36,7 +36,7 @@ func NewInputDialog(app *App, id, title, message string, buttons []string) *Inpu
 	for i, button := range buttons {
 		textLen := xstrings.Len(button)
 		btn := NewButton(d, d, fmt.Sprintf("%s__button%d", id, i))
-		btn.SetPosition(Position{fmt.Sprintf("%d%%-%d", (i*buttonCount+1)*100/(buttonCount*2), textLen/2), "80%", strconv.Itoa(textLen), "1"})
+		btn.SetPosition(Position{fmt.Sprintf("%d%%-%d", (i*buttonCount+1)*100/(buttonCount*2), textLen/2), "90%", strconv.Itoa(textLen), "1"})
 		btn.SetText(button)
 
 		btn.AddEventListener("clicked", func(ev *Event) bool {

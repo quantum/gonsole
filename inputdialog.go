@@ -19,11 +19,11 @@ func NewInputDialog(app *App, id, title, message string, buttons []string) *Inpu
 	d.SetPadding(Sides{1, 1, 1, 1})
 
 	label := NewLabel(d, d, fmt.Sprintf("%s__message", id))
-	label.SetPosition(Position{"0", "0", "100%", "80%"})
+	label.SetPosition(Position{"0", "0", "100%", "50%"})
 	label.SetText(message)
 
 	edit := NewEdit(d, d, "edit")
-	edit.SetPosition(Position{"0", "2", "100%", "1"})
+	edit.SetPosition(Position{"0", "50%+1", "100%", "1"})
 	edit.Focus()
 	edit.AddEventListener("submit", func(ev *Event) bool {
 		d.App().eventDispatcher.SubmitEvent(&Event{"closed", d, ev.Data})

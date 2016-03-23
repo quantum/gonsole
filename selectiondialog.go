@@ -9,6 +9,17 @@ import (
 
 type SelectionDialog struct {
 	BaseWindow
+
+	list        *List
+	buttonIndex int
+}
+
+func (d *SelectionDialog) SelectedItem() int {
+	return d.list.SelectedItem()
+}
+
+func (d *SelectionDialog) SelectedButton() int {
+	return d.buttonIndex
 }
 
 func NewSelectionDialog(app *App, id, title, message string, buttons []string, items []string) *SelectionDialog {
@@ -22,15 +33,10 @@ func NewSelectionDialog(app *App, id, title, message string, buttons []string, i
 	label.SetPosition(Position{"0", "0", "100%", "20%"})
 	label.SetText(message)
 
-	list := NewList(d, d, "list")
-	list.SetPosition(Position{"10%", "20%", "80%", "60%"})
-	list.SetOptions(items)
-	list.Focus()
-	list.AddEventListener("selected", func(ev *Event) bool {
-		d.App().eventDispatcher.SubmitEvent(&Event{"closed", d, ev.Data})
-		d.Close()
-		return true
-	})
+	d.list = NewList(d, d, "list")
+	d.list.SetPosition(Position{"10%", "20%", "80%", "60%"})
+	d.list.SetOptions(items)
+	d.list.Focus()
 
 	buttonCount := len(buttons)
 
@@ -40,10 +46,11 @@ func NewSelectionDialog(app *App, id, title, message string, buttons []string, i
 		btn.SetPosition(Position{fmt.Sprintf("%d%%-%d", (i*buttonCount+1)*100/(buttonCount*2), textLen/2), "90%", strconv.Itoa(textLen), "1"})
 		btn.SetText(button)
 
+		btnIndex := i
+
 		btn.AddEventListener("clicked", func(ev *Event) bool {
-			m := make(map[string]interface{})
-			m["index"] = i
-			d.App().eventDispatcher.SubmitEvent(&Event{"closed", d, m})
+			d.buttonIndex = btnIndex
+			d.App().eventDispatcher.SubmitEvent(&Event{"closed", d, nil})
 			d.Close()
 			return true
 		})

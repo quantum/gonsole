@@ -9,6 +9,12 @@ import (
 
 type MessageDialog struct {
 	BaseWindow
+
+	buttonIndex int
+}
+
+func (d *MessageDialog) SelectedButton() int {
+	return d.buttonIndex
 }
 
 func NewMessageDialog(app *App, id, title, message string, buttons []string) *MessageDialog {
@@ -34,10 +40,11 @@ func NewMessageDialog(app *App, id, title, message string, buttons []string) *Me
 			btn.Focus()
 		}
 
+		btnIndex := i
+
 		btn.AddEventListener("clicked", func(ev *Event) bool {
-			m := make(map[string]interface{})
-			m["index"] = i
-			d.App().eventDispatcher.SubmitEvent(&Event{"closed", d, m})
+			d.buttonIndex = btnIndex
+			d.App().eventDispatcher.SubmitEvent(&Event{"closed", d, nil})
 			d.Close()
 			return true
 		})

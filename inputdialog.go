@@ -9,6 +9,17 @@ import (
 
 type InputDialog struct {
 	BaseWindow
+
+	edit        *Edit
+	buttonIndex int
+}
+
+func (d *InputDialog) InputValue() string {
+	return d.edit.Value()
+}
+
+func (d *InputDialog) SelectedButton() int {
+	return d.buttonIndex
 }
 
 func NewInputDialog(app *App, id, title, message string, buttons []string) *InputDialog {
@@ -22,14 +33,9 @@ func NewInputDialog(app *App, id, title, message string, buttons []string) *Inpu
 	label.SetPosition(Position{"0", "0", "100%", "50%"})
 	label.SetText(message)
 
-	edit := NewEdit(d, d, "edit")
-	edit.SetPosition(Position{"0", "50%+1", "100%", "1"})
-	edit.Focus()
-	edit.AddEventListener("submit", func(ev *Event) bool {
-		d.App().eventDispatcher.SubmitEvent(&Event{"closed", d, ev.Data})
-		d.Close()
-		return true
-	})
+	d.edit = NewEdit(d, d, "edit")
+	d.edit.SetPosition(Position{"0", "50%+1", "100%", "1"})
+	d.edit.Focus()
 
 	buttonCount := len(buttons)
 
@@ -39,10 +45,11 @@ func NewInputDialog(app *App, id, title, message string, buttons []string) *Inpu
 		btn.SetPosition(Position{fmt.Sprintf("%d%%-%d", (i*buttonCount+1)*100/(buttonCount*2), textLen/2), "90%", strconv.Itoa(textLen), "1"})
 		btn.SetText(button)
 
+		btnIndex := i
+
 		btn.AddEventListener("clicked", func(ev *Event) bool {
-			m := make(map[string]interface{})
-			m["value"] = edit.Value()
-			d.App().eventDispatcher.SubmitEvent(&Event{"closed", d, m})
+			d.buttonIndex = btnIndex
+			d.App().eventDispatcher.SubmitEvent(&Event{"closed", d, nil})
 			d.Close()
 			return true
 		})

@@ -18,6 +18,10 @@ func NewList(win AppWindow, parent Container, id string) *List {
 	return list
 }
 
+func (l *List) SelectedItem() int {
+	return l.selectedIndex
+}
+
 func (l *List) Options() []string {
 	return l.options
 }

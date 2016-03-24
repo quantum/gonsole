@@ -5,7 +5,8 @@ import "github.com/nsf/termbox-go"
 type Button struct {
 	BaseControl
 
-	text string
+	text    string
+	onClick func()
 }
 
 func NewButton(win AppWindow, parent Container, id string) *Button {
@@ -24,6 +25,10 @@ func (b *Button) SetText(text string) {
 	b.text = text
 }
 
+func (b *Button) OnClick(handler func()) {
+	b.onClick = handler
+}
+
 func (b *Button) Repaint() {
 	if !b.Dirty() {
 		return
@@ -40,19 +45,21 @@ func (b *Button) Repaint() {
 	}
 }
 
-func (b *Button) ParseEvent(ev *termbox.Event) bool {
+func (b *Button) ParseEvent(ev *termbox.Event) (handled, repaint bool) {
 	switch ev.Type {
 	case termbox.EventKey:
 		switch ev.Key {
 		case termbox.KeySpace:
 			fallthrough
 		case termbox.KeyEnter:
-			b.SubmitEvent(&Event{"clicked", b, nil})
-			return true
+			if b.onClick != nil {
+				b.onClick()
+			}
+			return true, true
 		}
 	case termbox.EventError:
 		panic(ev.Err)
 	}
 
-	return false
+	return false, false
 }

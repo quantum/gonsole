@@ -1,26 +1,22 @@
 package gonsole
 
-import (
-	"fmt"
-
-	"github.com/nsf/termbox-go"
-)
+import "github.com/nsf/termbox-go"
 
 // App holds the global gonsole state.
 type App struct {
-	CloseKey        termbox.Key
-	eventDispatcher *EventDispatcher
-	windows         []AppWindow
-	theme           *Theme
-	channel         chan Event
+	CloseKey     termbox.Key
+	windows      []AppWindow
+	theme        *Theme
+	channel      chan string
+	globalEvents map[termbox.Key][]func()
 }
 
 // NewApp creates a new app
 func NewApp() *App {
 	app := &App{
-		eventDispatcher: NewEventDispatcher(),
-		theme:           defaultTheme,
-		channel:         make(chan Event),
+		theme:        defaultTheme,
+		channel:      make(chan string),
+		globalEvents: make(map[termbox.Key][]func(), 0),
 	}
 	return app
 }
@@ -57,7 +53,7 @@ func (app *App) Repaint() {
 
 func (app *App) putEvent(eventType string) {
 	go func() {
-		app.channel <- Event{Type: eventType, Source: app}
+		app.channel <- eventType
 	}()
 }
 
@@ -94,6 +90,7 @@ func (app *App) moveWindowToTop(win AppWindow) {
 
 func (app *App) addWindow(win AppWindow) {
 	app.windows = append(app.windows, win)
+	app.Redraw()
 }
 
 func (app *App) removeWindow(win AppWindow) bool {
@@ -104,7 +101,7 @@ func (app *App) removeWindow(win AppWindow) bool {
 			} else {
 				app.windows = app.windows[:i]
 			}
-			app.eventDispatcher.RemoveEventListener(win)
+			app.Redraw()
 			return true
 		}
 	}
@@ -113,10 +110,9 @@ func (app *App) removeWindow(win AppWindow) bool {
 
 func (app *App) parseGlobalEvent(ev *termbox.Event) bool {
 	if ev.Type == termbox.EventKey {
-		key := app.eventDispatcher.getKey(app, fmt.Sprintf("%d", ev.Key))
-		if funcs, ok := app.eventDispatcher.registeredEvents[key]; ok {
+		if funcs, ok := app.globalEvents[ev.Key]; ok {
 			for _, function := range funcs {
-				function(&Event{"key", app, nil})
+				function()
 			}
 		}
 	}
@@ -124,8 +120,13 @@ func (app *App) parseGlobalEvent(ev *termbox.Event) bool {
 	return false
 }
 
-func (app *App) AddEventListener(key termbox.Key, handler func(ev *Event) bool) {
-	app.eventDispatcher.AddEventListener(app, fmt.Sprintf("%d", key), handler)
+func (app *App) AddEventListener(key termbox.Key, handler func()) {
+	funcArray, ok := app.globalEvents[key]
+	if !ok {
+		funcArray = make([]func(), 0)
+	}
+	funcArray = append(funcArray, handler)
+	app.globalEvents[key] = funcArray
 }
 
 func (app *App) Run() {
@@ -155,14 +156,18 @@ func (app *App) Run() {
 				}
 
 				handled := false
+				repaint := false
 				activeWindow := app.activeWindow()
 				if activeWindow != nil {
-					handled = activeWindow.ParseEvent(&ev)
+					handled, repaint = activeWindow.ParseEvent(&ev)
 				}
 
 				if !handled {
 					app.parseGlobalEvent(&ev)
+				} else if repaint {
+					app.Repaint()
 				}
+
 			case termbox.EventResize:
 				app.Repaint()
 			case termbox.EventInterrupt:
@@ -172,9 +177,9 @@ func (app *App) Run() {
 			}
 
 		case ev := <-app.channel:
-			if ev.Type == "redraw" {
+			if ev == "redraw" {
 				app.Repaint()
-			} else if ev.Type == "quit" {
+			} else if ev == "quit" {
 				return
 			}
 		}

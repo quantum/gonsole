@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/quantum/castle-installer/Godeps/_workspace/src/github.com/huandu/xstrings"
+	"github.com/huandu/xstrings"
 )
 
 type MessageDialog struct {
@@ -42,11 +42,12 @@ func NewMessageDialog(app *App, id, title, message string, buttons []string) *Me
 
 		btnIndex := i
 
-		btn.AddEventListener("clicked", func(ev *Event) bool {
+		btn.OnClick(func() {
 			d.buttonIndex = btnIndex
-			d.App().eventDispatcher.SubmitEvent(&Event{"closed", d, nil})
-			d.Close()
-			return true
+			d.App().removeWindow(d)
+			if d.onClose != nil {
+				d.onClose()
+			}
 		})
 	}
 	return d

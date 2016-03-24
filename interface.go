@@ -42,9 +42,7 @@ type Element interface {
 	BorderBox() Box
 	ContentBox() Box
 
-	AddEventListener(eventType string, handler func(ev *Event) bool)
-	SubmitEvent(ev *Event)
-	ParseEvent(ev *termbox.Event) bool
+	ParseEvent(ev *termbox.Event) (handled, repaint bool)
 
 	Repaint()
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/quantum/castle-installer/Godeps/_workspace/src/github.com/huandu/xstrings"
+	"github.com/huandu/xstrings"
 )
 
 type InputDialog struct {
@@ -36,6 +36,12 @@ func NewInputDialog(app *App, id, title, message string, buttons []string) *Inpu
 	d.edit = NewEdit(d, d, "edit")
 	d.edit.SetPosition(Position{"0", "50%+1", "100%", "1"})
 	d.edit.Focus()
+	d.edit.OnSubmit(func(string) {
+		d.App().removeWindow(d)
+		if d.onClose != nil {
+			d.onClose()
+		}
+	})
 
 	buttonCount := len(buttons)
 
@@ -47,11 +53,12 @@ func NewInputDialog(app *App, id, title, message string, buttons []string) *Inpu
 
 		btnIndex := i
 
-		btn.AddEventListener("clicked", func(ev *Event) bool {
+		btn.OnClick(func() {
 			d.buttonIndex = btnIndex
-			d.App().eventDispatcher.SubmitEvent(&Event{"closed", d, nil})
-			d.Close()
-			return true
+			d.App().removeWindow(d)
+			if d.onClose != nil {
+				d.onClose()
+			}
 		})
 	}
 	return d

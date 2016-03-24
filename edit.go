@@ -13,6 +13,7 @@ type Edit struct {
 	maxWidth      int
 	cursorPos     int
 	startingIndex int
+	onSubmit      func(value string)
 }
 
 func NewEdit(win AppWindow, parent Container, id string) *Edit {
@@ -38,6 +39,10 @@ func (e *Edit) MaxWidth() int {
 
 func (e *Edit) SetMaxWidth(width int) {
 	e.maxWidth = width
+}
+
+func (e *Edit) OnSubmit(handler func(string)) {
+	e.onSubmit = handler
 }
 
 func (e *Edit) Repaint() {
@@ -74,7 +79,7 @@ func (e *Edit) Repaint() {
 	DrawTextSimple(shownValue, true, box, fg, bg)
 
 	if e.Focused() {
-		DrawTextSimple(" ", false, Box{box.Left+cursorOffset, box.Top, 1, 1}, t.ColorTermbox("cursor"), bg)
+		DrawTextSimple(" ", false, Box{box.Left + cursorOffset, box.Top, 1, 1}, t.ColorTermbox("cursor"), bg)
 		DrawCursor(box.Left+cursorOffset, box.Top)
 	}
 }
@@ -192,53 +197,45 @@ func (e *Edit) handleEnd() {
 	}
 }
 
-func (e *Edit) ParseEvent(ev *termbox.Event) bool {
+func (e *Edit) ParseEvent(ev *termbox.Event) (handled, repaint bool) {
 	switch ev.Type {
 	case termbox.EventKey:
 		switch ev.Key {
 		case termbox.KeySpace:
 			e.handleChar(' ')
-			e.GetWindow().App().Redraw()
-			return true
+			return true, true
 		case termbox.KeyBackspace, termbox.KeyBackspace2:
 			e.handleBackspace()
-			e.GetWindow().App().Redraw()
-			return true
+			return true, true
 		case termbox.KeyDelete:
 			e.handleDelete()
-			e.GetWindow().App().Redraw()
-			return true
+			return true, true
 		case termbox.KeyArrowLeft:
 			e.handleLeft()
-			e.GetWindow().App().Redraw()
-			return true
+			return true, true
 		case termbox.KeyArrowRight:
 			e.handleRight()
-			e.GetWindow().App().Redraw()
-			return true
+			return true, true
 		case termbox.KeyHome:
 			e.handleHome()
-			e.GetWindow().App().Redraw()
-			return true
+			return true, true
 		case termbox.KeyEnd:
 			e.handleEnd()
-			e.GetWindow().App().Redraw()
-			return true
+			return true, true
 		case termbox.KeyEnter:
-			m := make(map[string]interface{})
-			m["value"] = e.value
-			e.SubmitEvent(&Event{"submit", e, m})
-			return true
+			if e.onSubmit != nil {
+				e.onSubmit(e.value)
+			}
+			return true, false
 		default:
 			if ev.Ch != 0 {
 				e.handleChar(ev.Ch)
-				e.GetWindow().App().Redraw()
-				return true
+				return true, true
 			}
 		}
 	case termbox.EventError:
 		panic(ev.Err)
 	}
 
-	return false
+	return false, false
 }

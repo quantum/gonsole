@@ -11,11 +11,10 @@ func openConfirmExit(app *g.App) {
 
 	d := g.NewMessageDialog(app, "exit", title, message, []string{"Yes", "No"})
 	d.SetPosition(g.Position{"30%", "30%", "40%", "30%"})
-	d.AddEventListener("closed", func(ev *g.Event) bool {
+	d.OnClose(func() {
 		if d.SelectedButton() == 0 {
 			app.Stop()
 		}
-		return true
 	})
 }
 
@@ -25,13 +24,12 @@ func openConfirmInput(app *g.App, value string) {
 
 	d := g.NewMessageDialog(app, "confirminput", title, message, []string{"Yes", "No"})
 	d.SetPosition(g.Position{"30%", "30%", "40%", "30%"})
-	d.AddEventListener("closed", func(ev *g.Event) bool {
+	d.OnClose(func() {
 		if d.SelectedButton() == 0 {
 			openSelectionDialog(app)
 		} else {
 			openInputDialog(app)
 		}
-		return true
 	})
 }
 
@@ -41,13 +39,12 @@ func openConfirmColor(app *g.App, value string) {
 
 	d := g.NewMessageDialog(app, "confirmcolor", title, message, []string{"Yes", "No"})
 	d.SetPosition(g.Position{"30%", "30%", "40%", "30%"})
-	d.AddEventListener("closed", func(ev *g.Event) bool {
+	d.OnClose(func() {
 		if d.SelectedButton() == 0 {
 			app.Stop()
 		} else {
-			openInputDialog(app)
+			openSelectionDialog(app)
 		}
-		return true
 	})
 }
 
@@ -58,13 +55,12 @@ func openSelectionDialog(app *g.App) {
 	options := []string{"Red", "Blue", "Green"}
 	d := g.NewSelectionDialog(app, "selection", title, message, []string{"OK", "Cancel"}, options)
 	d.SetPosition(g.Position{"15%", "25%", "70%", "40%"})
-	d.AddEventListener("closed", func(ev *g.Event) bool {
+	d.OnClose(func() {
 		if d.SelectedButton() == 0 {
 			openConfirmColor(app, options[d.SelectedItem()])
 		} else {
 			app.Stop()
 		}
-		return true
 	})
 }
 
@@ -74,13 +70,12 @@ func openInputDialog(app *g.App) {
 
 	d := g.NewInputDialog(app, "input", title, message, []string{"OK", "Cancel"})
 	d.SetPosition(g.Position{"15%", "25%", "70%", "40%"})
-	d.AddEventListener("closed", func(ev *g.Event) bool {
+	d.OnClose(func() {
 		if d.SelectedButton() == 0 {
 			openConfirmInput(app, d.InputValue())
 		} else {
 			app.Stop()
 		}
-		return true
 	})
 }
 
@@ -88,9 +83,8 @@ func main() {
 	app := g.NewApp()
 	app.CloseKey = termbox.KeyCtrlQ
 
-	app.AddEventListener(termbox.KeyF10, func(ev *g.Event) bool {
+	app.AddEventListener(termbox.KeyF10, func() {
 		openConfirmExit(app)
-		return true
 	})
 
 	infoBar := g.NewWindow(app, "info")

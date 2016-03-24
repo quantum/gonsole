@@ -8,6 +8,7 @@ type List struct {
 	options       []string
 	selectedIndex int
 	topIndex      int
+	onSumbit      func(int)
 }
 
 func NewList(win AppWindow, parent Container, id string) *List {
@@ -28,6 +29,10 @@ func (l *List) Options() []string {
 
 func (l *List) SetOptions(options []string) {
 	l.options = options
+}
+
+func (l *List) OnSumbit(handler func(int)) {
+	l.onSumbit = handler
 }
 
 func (l *List) Repaint() {
@@ -65,7 +70,7 @@ func (l *List) Repaint() {
 	}
 }
 
-func (l *List) ParseEvent(ev *termbox.Event) bool {
+func (l *List) ParseEvent(ev *termbox.Event) (handled, repaint bool) {
 	switch ev.Type {
 	case termbox.EventKey:
 		switch ev.Key {
@@ -77,8 +82,7 @@ func (l *List) ParseEvent(ev *termbox.Event) bool {
 					l.topIndex++
 				}
 			}
-			l.GetWindow().App().Redraw()
-			return true
+			return true, true
 
 		case termbox.KeyArrowUp:
 			if l.selectedIndex > 0 {
@@ -87,13 +91,12 @@ func (l *List) ParseEvent(ev *termbox.Event) bool {
 					l.topIndex--
 				}
 			}
-			l.GetWindow().App().Redraw()
-			return true
+			return true, true
 
 		case termbox.KeyHome:
 			l.selectedIndex = 0
 			l.topIndex = 0
-			return true
+			return true, true
 
 		case termbox.KeyEnd:
 			l.selectedIndex = len(l.options) - 1
@@ -101,20 +104,19 @@ func (l *List) ParseEvent(ev *termbox.Event) bool {
 			if contentBox.Height > 0 {
 				l.topIndex = len(l.options) - contentBox.Height
 			}
-			l.GetWindow().App().Redraw()
-			return true
+			return true, true
 
 		case termbox.KeySpace:
 			fallthrough
 		case termbox.KeyEnter:
-			m := make(map[string]interface{})
-			m["index"] = l.selectedIndex
-			l.SubmitEvent(&Event{"selected", l, m})
-			return true
+			if l.onSumbit != nil {
+				l.onSumbit(l.selectedIndex)
+			}
+			return true, false
 		}
 	case termbox.EventError:
 		panic(ev.Err)
 	}
 
-	return false
+	return false, false
 }

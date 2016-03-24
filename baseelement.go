@@ -158,16 +158,8 @@ func (e *BaseElement) ContentBox() Box {
 	return contentBox
 }
 
-func (e *BaseElement) AddEventListener(eventType string, handler func(ev *Event) bool) {
-	e.window.App().eventDispatcher.AddEventListener(e, eventType, handler)
-}
-
-func (e *BaseElement) SubmitEvent(ev *Event) {
-	e.window.App().eventDispatcher.SubmitEvent(ev)
-}
-
-func (e *BaseElement) ParseEvent(ev *termbox.Event) bool {
-	return false
+func (e *BaseElement) ParseEvent(ev *termbox.Event) (handled, repaint bool) {
+	return false, false
 }
 
 func (e *BaseElement) drawBox(status string) {

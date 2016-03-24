@@ -9,6 +9,7 @@ type BaseWindow struct {
 
 	app            *App
 	focusedControl Control
+	onClose        func()
 }
 
 func (win *BaseWindow) Init(app *App, id string) {
@@ -42,7 +43,6 @@ func (win *BaseWindow) FocusControl(control Control) {
 	for _, loopFC := range win.ChildrenDeep() {
 		if loopFC.ID() == control.ID() {
 			win.focusedControl = loopFC
-			win.App().Redraw()
 			return
 		}
 	}
@@ -51,6 +51,10 @@ func (win *BaseWindow) FocusControl(control Control) {
 func (win *BaseWindow) Close() {
 	win.App().removeWindow(win)
 	win.App().Redraw()
+}
+
+func (win *BaseWindow) OnClose(handler func()) {
+	win.onClose = handler
 }
 
 func (win *BaseWindow) moveFocus(num int) {
@@ -91,12 +95,15 @@ func (win *BaseWindow) getFocusableControls() []Control {
 }
 
 // return true if event was parsed and should not continue bubbling up
-func (win *BaseWindow) ParseEvent(ev *termbox.Event) bool {
+func (win *BaseWindow) ParseEvent(ev *termbox.Event) (handled, repaint bool) {
 	// TODO window level event parsing, support tabbing for changing focus
 
 	// dispatch event to currently focussed control
-	if win.FocusedControl() != nil && win.FocusedControl().ParseEvent(ev) {
-		return true
+	if win.FocusedControl() != nil {
+		handled, repaint = win.FocusedControl().ParseEvent(ev)
+		if handled {
+			return handled, repaint
+		}
 	}
 
 	// focus navigation events
@@ -106,14 +113,17 @@ func (win *BaseWindow) ParseEvent(ev *termbox.Event) bool {
 		switch ev.Key {
 		case termbox.KeyTab:
 			win.moveFocus(1)
+			return true, true
 		case termbox.KeyArrowDown, termbox.KeyArrowRight:
 			win.moveFocus(1)
+			return true, true
 		case termbox.KeyArrowUp, termbox.KeyArrowLeft:
 			win.moveFocus(-1)
+			return true, true
 		}
 	}
 
-	return false
+	return false, false
 }
 
 func (win *BaseWindow) Repaint() {

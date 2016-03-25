@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/huandu/xstrings"
-	xs "github.com/quantum/castle-installer/Godeps/_workspace/src/github.com/huandu/xstrings"
+	xs "github.com/huandu/xstrings"
 )
 
 type Progress struct {
@@ -53,7 +52,7 @@ func (p *Progress) Repaint() {
 
 	text := strings.Repeat(" ", (cb.Width/2)-1)
 	text += fmt.Sprintf("%d%%", int(p.value*100))
-	text += strings.Repeat(" ", cb.Width-xstrings.Len(text))
+	text += strings.Repeat(" ", cb.Width-xs.Len(text))
 
 	t := p.Theme()
 	percent := int(p.value * float32(cb.Width))
